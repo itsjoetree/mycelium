@@ -3,6 +3,7 @@ import { trades, tradeItems, resources } from '../../db/schema';
 import { eq, inArray, and } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 import { WebSocketManager } from '../../lib/ws';
+import { tradeQueue } from '../../lib/queue';
 
 export class TradeService {
     static async createTrade(initiatorId: number, receiverId: number, resourceIds: number[]) {
@@ -54,6 +55,11 @@ export class TradeService {
 
             // Notify receiver
             WebSocketManager.send(receiverId, { type: 'TRADE_PROPOSED', tradeId: trade.id });
+
+            // Schedule expiration (e.g. 10 seconds for demo purposes, normally 24h)
+            // 24h = 86400000 ms
+            // Demo = 5000 ms
+            await tradeQueue.add('expire-trade', { tradeId: trade.id }, { delay: 86400000 });
 
             return trade;
         });
