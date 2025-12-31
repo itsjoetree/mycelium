@@ -6,8 +6,8 @@ import { WebSocketManager } from './ws';
 
 // Connect to Redis
 const connection = {
-    host: 'localhost',
-    port: 6379,
+    host: process.env.REDIS_HOST || 'localhost',
+    port: parseInt(process.env.REDIS_PORT || '6379'),
 };
 
 // Mock queue for tests if needed, or rely on mocking library. 
