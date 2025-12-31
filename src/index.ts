@@ -7,9 +7,12 @@ import authApp from './modules/auth';
 import resourceApp from './modules/resources';
 import tradeApp from './modules/trades';
 
+import { rateLimiter } from './lib/rate-limit';
+
 const app = new OpenAPIHono();
 
 app.use('*', logger());
+app.use('*', rateLimiter({ windowMs: 60 * 1000, maxRequests: 100 })); // 100 reqs per minute
 app.onError(errorHandler);
 app.notFound(notFoundHandler);
 
