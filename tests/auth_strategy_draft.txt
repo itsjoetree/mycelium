@@ -1,0 +1,30 @@
+import { describe, expect, test, beforeAll, afterAll } from 'bun:test';
+import { setupTestDb, teardownTestDb, testDb } from './setup';
+import authApp from '../src/modules/auth'; // Import module router
+import { Hono } from 'hono';
+import { users } from '../src/db/schema';
+import { eq } from 'drizzle-orm';
+import { db } from '../src/db';
+
+// We need to override the 'db' import in the app or use dependency injection.
+// Since we used a singleton 'db' imported in service.ts, this is hard to mock without bun's module mocking.
+// Bun test supports mocking modules. Let's try that.
+
+describe('Auth Module', () => {
+    // Note: Mocking singleton 'db' efficiently in Bun requires understanding module cache.
+    // For a cleaner integration test in this architecture without DI, 
+    // we might need to rely on the fact that if we configure the ENV correctly,
+    // the app connects to the TEST DB.
+    // But our `tests/setup.ts` creates a NEW db instance `testDb`.
+    
+    // STRATEGY: 
+    // 1. We should ideally refactor the app to accept db injection.
+    // 2. OR, simpler for now: We point the GLOBAL `DATABASE_URL` to `mycelium_test` 
+    //    BEFORE imports happen in the test file?
+    //    But `src/db/index.ts` reads it at top level.
+    
+    // Let's just create the setup to return the connection string and use `process.env.DATABASE_URL`?
+    // But `src/db/index.ts` is already imported by `authApp` import likely.
+    
+    // ALTERNATIVE: Use `mock.module` from bun:test
+});

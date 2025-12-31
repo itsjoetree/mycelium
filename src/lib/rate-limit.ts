@@ -10,7 +10,7 @@ interface RateLimitConfig {
 const ipHits = new Map<string, number[]>();
 
 // Cleanup interval (simple garbage collection)
-setInterval(() => {
+const cleanupParams = setInterval(() => {
     const now = Date.now();
     for (const [ip, timestamps] of ipHits.entries()) {
         // Keep only timestamps within the longest possible window (e.g., 1 min)
@@ -22,6 +22,9 @@ setInterval(() => {
         }
     }
 }, 60000); // Run every minute
+
+// Allow process to exit even if this interval is running (crucial for tests)
+if (cleanupParams.unref) cleanupParams.unref();
 
 export const rateLimiter = (config: RateLimitConfig) => createMiddleware(async (c, next) => {
     // Identify client by IP (or X-Forwarded-For)
