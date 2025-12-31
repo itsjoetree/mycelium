@@ -8,8 +8,6 @@ export class TradeService {
     static async createTrade(initiatorId: number, receiverId: number, resourceIds: number[]) {
         return await db.transaction(async (tx) => {
             // 1. Verify all resources exist and belong to either initiator or receiver
-            // In a real app, we'd enforce that one set belongs to initiator and one to receiver
-            // For now, checks are simplified to "existence"
 
             const foundResources = await tx
                 .select()
@@ -24,6 +22,16 @@ export class TradeService {
             const unavailable = foundResources.filter((r) => r.status !== 'available');
             if (unavailable.length > 0) {
                 throw new HTTPException(400, { message: `Resources ${unavailable.map(r => r.id).join(', ')} are not available` });
+            }
+
+            // Enforce ownership: Resources must belong to either initiator or receiver
+            const invalidOwner = foundResources.find(
+                (r) => r.ownerId !== initiatorId && r.ownerId !== receiverId
+            );
+            if (invalidOwner) {
+                throw new HTTPException(400, {
+                    message: `Resource ${invalidOwner.id} does not belong to trade participants`
+                });
             }
 
             // 2. Create the trade record
