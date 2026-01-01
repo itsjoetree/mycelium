@@ -40,4 +40,8 @@ export class AuthService {
 
         return session;
     }
+
+    static async deleteSession(sessionId: string) {
+        await db.delete(sessions).where(eq(sessions.id, sessionId));
+    }
 }

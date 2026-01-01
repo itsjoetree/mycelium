@@ -113,4 +113,76 @@ authApp.openapi(
     },
 );
 
+authApp.openapi(
+    {
+        method: 'get',
+        path: '/me',
+        description: 'Get current user session',
+        security: [{ cookieAuth: [] }],
+        responses: {
+            200: {
+                description: 'Current user info',
+                content: {
+                    'application/json': {
+                        schema: z.object({
+                            id: z.number(),
+                            username: z.string(),
+                            email: z.string(),
+                        }),
+                    },
+                },
+            },
+            401: { description: 'Unauthorized' },
+        },
+    },
+    async (c) => {
+        // Ideally utilize requireAuth or manual check to return user info
+        // We need helper to get user from session without throwing? 
+        // Or just use requireAuth and then fetch user.
+        // requireAuth returns userId.
+
+        // Manual check for "optional" auth or just strict?
+        // Strictly /me requires auth.
+        const cookie = c.req.header('Cookie');
+        const sessionId = cookie?.match(/session_id=([^;]+)/)?.[1];
+        if (!sessionId) return c.json({ error: 'Unauthorized' }, 401);
+
+        const session = await AuthService.validateSession(sessionId);
+        if (!session) return c.json({ error: 'Unauthorized' }, 401);
+
+        const [user] = await db.select().from(users).where(eq(users.id, session.userId));
+        return c.json({ id: user.id, username: user.username, email: user.email }, 200);
+    }
+);
+
+authApp.openapi(
+    {
+        method: 'post',
+        path: '/logout',
+        description: 'Logout current user',
+        security: [{ cookieAuth: [] }],
+        responses: {
+            200: { description: 'Logged out successfully' },
+            401: { description: 'Unauthorized' },
+        },
+    },
+    async (c) => {
+        const cookie = c.req.header('Cookie');
+        const sessionId = cookie?.match(/session_id=([^;]+)/)?.[1];
+        if (sessionId) {
+            await AuthService.deleteSession(sessionId);
+        }
+
+        setCookie(c, 'session_id', '', {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'Strict',
+            path: '/',
+            maxAge: 0,
+        });
+
+        return c.json({ message: 'Logged out successfully' }, 200);
+    }
+);
+
 export default authApp;

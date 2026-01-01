@@ -1,6 +1,6 @@
 import { OpenAPIHono, z } from '@hono/zod-openapi';
 import { db } from '../../db';
-import { resources } from '../../db/schema';
+import { resources, users } from '../../db/schema';
 import { requireAuth } from '../auth/helper';
 import { eq, desc, and, gte, lte } from 'drizzle-orm';
 
@@ -58,18 +58,57 @@ resourceApp.openapi(
     },
 );
 
+const resourceSchema = z.object({
+    id: z.number(),
+    title: z.string(),
+    description: z.string().optional(),
+    type: z.enum(['seed', 'compost', 'harvest', 'labor']),
+    quantity: z.number(),
+    unit: z.string(),
+    ownerId: z.number(),
+    ownerUsername: z.string().nullable(),
+    status: z.string(),
+    latitude: z.number().optional(),
+    longitude: z.number().optional(),
+    createdAt: z.string(),
+});
+
 resourceApp.openapi(
     {
         method: 'get',
         path: '/',
         description: 'List resources',
         responses: {
-            200: { description: 'List of resources' },
+            200: {
+                description: 'List of resources',
+                content: {
+                    'application/json': {
+                        schema: z.array(resourceSchema),
+                    },
+                },
+            },
         },
     },
     async (c) => {
-        const allResources = await db.select().from(resources).orderBy(desc(resources.createdAt)).limit(50);
-        return c.json(allResources, 200);
+        const list = await db
+            .select({
+                id: resources.id,
+                title: resources.title,
+                description: resources.description,
+                type: resources.type,
+                quantity: resources.quantity,
+                unit: resources.unit,
+                ownerId: resources.ownerId,
+                status: resources.status,
+                latitude: resources.latitude,
+                longitude: resources.longitude,
+                createdAt: resources.createdAt,
+                ownerUsername: users.username,
+            })
+            .from(resources)
+            .leftJoin(users, eq(resources.ownerId, users.id));
+
+        return c.json(list as any, 200);
     },
 );
 
