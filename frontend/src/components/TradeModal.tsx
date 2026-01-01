@@ -41,7 +41,7 @@ export const TradeModal: React.FC<TradeModalProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[2000]">
             <Card className="w-full max-w-sm border-primary shadow-[0_0_50px_rgba(0,255,157,0.2)]">
                 <h3 className="mb-2">Request {resourceTitle}</h3>
                 <p className="mb-8 text-text-muted font-mono">Propose a trade with @{receiverUsername || receiverId}</p>

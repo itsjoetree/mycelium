@@ -3,12 +3,14 @@ import { cn } from '../../lib/utils';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: 'primary' | 'secondary' | 'ghost' | 'outline';
+    size?: 'sm' | 'md';
     isLoading?: boolean;
 }
 
 export const Button: React.FC<ButtonProps> = ({
     children,
     variant = 'primary',
+    size = 'md',
     isLoading,
     className,
     ...props
@@ -20,11 +22,17 @@ export const Button: React.FC<ButtonProps> = ({
         outline: "bg-transparent border-glass-surface text-text-muted hover:border-primary hover:text-primary"
     };
 
+    const sizes = {
+        sm: "px-3 py-1 text-[0.65rem]",
+        md: "px-6 py-3 text-sm"
+    };
+
     return (
         <button
             className={cn(
-                "inline-flex items-center justify-center px-6 py-3 rounded-sm font-medium transition-all duration-300 ease-elastic border border-transparent uppercase tracking-wider relative overflow-hidden text-sm disabled:opacity-60 disabled:cursor-not-allowed disabled:border-glass-surface",
+                "inline-flex items-center justify-center rounded-sm font-medium transition-all duration-300 ease-elastic border border-transparent uppercase tracking-wider relative overflow-hidden disabled:opacity-60 disabled:cursor-not-allowed disabled:border-glass-surface",
                 variants[variant],
+                sizes[size],
                 className
             )}
             disabled={isLoading || props.disabled}

@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 @layer base {
-  body {
+
+  :root {
     @apply bg-bg-base text-text-main font-display min-h-screen bg-fixed;
     background-image:
       radial-gradient(circle at 10% 20%, rgba(0, 255, 157, 0.05) 0%, transparent 40%),
@@ -49,4 +50,47 @@
   100% {
     transform: rotate(360deg);
   }
+}
+
+/* Leaflet Map Styling */
+.map-container {
+  height: 600px !important;
+  width: 100% !important;
+  min-height: 600px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid var(--color-glass-surface);
+  z-index: 1;
+}
+
+.leaflet-container {
+  background-color: var(--color-bg-deep) !important;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: rgba(10, 25, 20, 0.9) !important;
+  backdrop-filter: blur(10px) !important;
+  color: var(--color-text) !important;
+  border: 1px solid var(--color-primary-dirty) !important;
+  border-radius: 4px !important;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5) !important;
+}
+
+.leaflet-popup-content {
+  font-family: var(--font-mono) !important;
+  margin: 12px 16px !important;
+}
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+  background: rgba(10, 25, 20, 0.8) !important;
+  color: var(--color-primary) !important;
+  border: 1px solid var(--color-glass-surface) !important;
+}
+
+.leaflet-control-zoom-in:hover,
+.leaflet-control-zoom-out:hover {
+  background: var(--color-primary-dirty) !important;
+  color: var(--color-bg-deep) !important;
 }
