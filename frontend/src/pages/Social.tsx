@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useUserSession } from '../hooks/useAuth';
 import { useFriends, usePendingRequests, useOutboundRequests, useSendFriendRequest, useAcceptFriendRequest, useRejectFriendRequest, useInteractions, useSendMessage, useRemoveFriend } from '../hooks/useSocial';
 import { useUserSearch } from '../hooks/useUsers';
@@ -18,6 +19,7 @@ function cn(...inputs: any[]) {
 }
 
 export const Social: React.FC = () => {
+    const { t } = useTranslation();
     const { data: session, isLoading: sessionLoading } = useUserSession();
     const { data: friends } = useFriends();
     const { data: inboundRequests } = usePendingRequests();
@@ -68,27 +70,27 @@ export const Social: React.FC = () => {
     const handleSendRequest = async (userId: number) => {
         try {
             await sendRequest.mutateAsync(userId);
-            toast.success('Connection request broadcasted');
+            toast.success(t('social.toasts.request_sent'));
         } catch (err: any) {
-            toast.error(err?.message || 'Broadcast failed');
+            toast.error(err?.message || t('social.toasts.request_fail'));
         }
     };
 
     const handleAccept = async (userId: number) => {
         try {
             await acceptRequest.mutateAsync(userId);
-            toast.success('Frequency matched. Node synced.');
+            toast.success(t('social.toasts.synced'));
         } catch (err: any) {
-            toast.error('Sync failed');
+            toast.error(t('social.toasts.sync_fail'));
         }
     };
 
     const handleReject = async (userId: number) => {
         try {
             await rejectRequest.mutateAsync(userId);
-            toast.success('Signal rejected');
+            toast.success(t('social.toasts.rejected'));
         } catch (err: any) {
-            toast.error('Rejection failed');
+            toast.error(t('social.toasts.reject_fail'));
         }
     };
 
@@ -105,7 +107,7 @@ export const Social: React.FC = () => {
                 setTradeModalOpen(true);
             }
         } catch (err) {
-            toast.error('Failed to intercept node resources');
+            toast.error(t('social.toasts.fetch_fail'));
         } finally {
             setIsFetchingResources(false);
         }
@@ -115,11 +117,11 @@ export const Social: React.FC = () => {
         if (!selectedFriendId) return;
         try {
             await removeFriendHook.mutateAsync(selectedFriendId);
-            toast.success('Node disconnected');
+            toast.success(t('social.toasts.disconnected'));
             setRemoveModalOpen(false);
             setSelectedFriendId(null);
         } catch (err: any) {
-            toast.error('Disconnect protocol failed');
+            toast.error(t('social.toasts.disconnect_fail'));
         }
     };
 
@@ -135,11 +137,11 @@ export const Social: React.FC = () => {
             await sendMessage.mutateAsync({ receiverId: selectedFriendId, content: msgContent });
             setMsgContent('');
         } catch (err: any) {
-            toast.error('Failed to transmit message');
+            toast.error(t('social.toasts.transmit_fail'));
         }
     };
 
-    if (sessionLoading) return <GlobalLoading message="INITIALIZING NEURAL LINK..." />;
+    if (sessionLoading) return <GlobalLoading message={t('common.init')} />;
     if (!session) return null;
 
     return (
@@ -149,7 +151,7 @@ export const Social: React.FC = () => {
                 <aside className="w-80 border-r border-white/5 flex flex-col bg-white/[0.01]">
                     <div className="p-6 border-b border-white/5">
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-white">Network</h2>
+                            <h2 className="text-sm font-bold uppercase tracking-[0.3em] text-white">{t('social.sidebar.title')}</h2>
                             <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_var(--accent)]" />
                         </div>
 
@@ -159,7 +161,7 @@ export const Social: React.FC = () => {
                                 type="text"
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                placeholder="Scan Node IDs..."
+                                placeholder={t('social.sidebar.search_placeholder')}
                                 className="w-full h-11 bg-white/5 border border-white/5 rounded-xl px-4 pr-10 text-xs font-mono transition-all"
                             />
                             <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -176,10 +178,10 @@ export const Social: React.FC = () => {
                         {/* Search Results */}
                         {debouncedSearch && (
                             <div>
-                                <h3 className="text-[0.6rem] font-bold uppercase tracking-widest text-text-muted mb-3 px-2">Discovery Output</h3>
+                                <h3 className="text-[0.6rem] font-bold uppercase tracking-widest text-text-muted mb-3 px-2">{t('social.sidebar.discovery_title')}</h3>
                                 <div className="space-y-1">
                                     {!searchResults || searchResults.length === 0 ? (
-                                        <p className="text-[0.6rem] text-text-muted p-4 italic text-center bg-white/[0.02] rounded-xl border border-dashed border-white/5">No compatible nodes detected</p>
+                                        <p className="text-[0.6rem] text-text-muted p-4 italic text-center bg-white/[0.02] rounded-xl border border-dashed border-white/5">{t('social.empty.no_nodes')}</p>
                                     ) : (
                                         searchResults.map((user: any) => {
                                             const isFriend = friends?.some(f => f.id === user.id);
@@ -203,7 +205,7 @@ export const Social: React.FC = () => {
                                                             onClick={() => handleSendRequest(user.id)}
                                                             disabled={isOutboundPending}
                                                         >
-                                                            {isOutboundPending ? 'Pulsing...' : 'Link'}
+                                                            {isOutboundPending ? t('social.sidebar.pulsing') : t('social.sidebar.connect')}
                                                         </Button>
                                                     )}
                                                 </div>
@@ -219,7 +221,7 @@ export const Social: React.FC = () => {
                             <div>
                                 <h3 className="text-[0.6rem] font-bold uppercase tracking-widest text-primary mb-3 px-2 flex items-center gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                                    Incoming Uplinks
+                                    {t('social.sidebar.incoming_title')}
                                 </h3>
                                 <div className="space-y-2">
                                     {inboundRequests.map((req: any) => (
@@ -231,8 +233,8 @@ export const Social: React.FC = () => {
                                                 <p className="text-xs font-bold text-white">@{req.senderUsername}</p>
                                             </div>
                                             <div className="flex gap-2">
-                                                <Button className="flex-1 h-7 text-[0.6rem] uppercase font-bold" onClick={() => handleAccept(req.senderId)}>Sync</Button>
-                                                <Button variant="secondary" className="flex-1 h-7 text-[0.6rem] uppercase font-bold bg-white/5 border-white/10" onClick={() => handleReject(req.senderId)}>Reject</Button>
+                                                <Button className="flex-1 h-7 text-[0.6rem] uppercase font-bold" onClick={() => handleAccept(req.senderId)}>{t('social.sidebar.sync')}</Button>
+                                                <Button variant="secondary" className="flex-1 h-7 text-[0.6rem] uppercase font-bold bg-white/5 border-white/10" onClick={() => handleReject(req.senderId)}>{t('social.sidebar.reject')}</Button>
                                             </div>
                                         </div>
                                     ))}
@@ -242,7 +244,7 @@ export const Social: React.FC = () => {
 
                         {/* Friends List */}
                         <div>
-                            <h3 className="text-[0.6rem] font-bold uppercase tracking-widest text-text-muted mb-3 px-2">Synced Nodes</h3>
+                            <h3 className="text-[0.6rem] font-bold uppercase tracking-widest text-text-muted mb-3 px-2">{t('social.sidebar.active_nodes')}</h3>
                             <div className="space-y-1">
                                 {friends?.map((friend: any) => (
                                     <button
@@ -263,12 +265,12 @@ export const Social: React.FC = () => {
                                         </div>
                                         <div className="flex-1 text-left">
                                             <p className={cn("text-xs font-bold transition-colors", selectedFriendId === friend.id ? "text-white" : "text-text-muted")}>@{friend.username}</p>
-                                            <p className="text-[0.55rem] font-mono text-text-muted/60">ACTIVE_LINK</p>
+                                            <p className="text-[0.55rem] font-mono text-text-muted/60">{t('social.sidebar.active_link')}</p>
                                         </div>
                                     </button>
                                 ))}
                                 {(!friends || friends.length === 0) && (
-                                    <p className="text-[0.6rem] text-text-muted italic text-center p-8 bg-white/[0.01] rounded-2xl border border-dashed border-white/5">Isolated. Scan for nodes.</p>
+                                    <p className="text-[0.6rem] text-text-muted italic text-center p-8 bg-white/[0.01] rounded-2xl border border-dashed border-white/5">{t('social.empty.isolated')}</p>
                                 )}
                             </div>
                         </div>
@@ -291,7 +293,7 @@ export const Social: React.FC = () => {
                                         <h2 className="text-lg font-bold text-white leading-none mb-1">@{selectedFriend.username}</h2>
                                         <div className="flex items-center gap-2">
                                             <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_5px_var(--accent)]" />
-                                            <span className="text-[0.6rem] font-mono text-primary/60 uppercase tracking-widest">ENCRYPTED_UPLINK</span>
+                                            <span className="text-[0.6rem] font-mono text-primary/60 uppercase tracking-widest">{t('social.chat.encrypted')}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -301,7 +303,7 @@ export const Social: React.FC = () => {
                                         className="h-10 px-6 text-[0.65rem] uppercase tracking-widest font-bold bg-primary/10 border-primary/40 text-primary hover:bg-primary/20 shadow-[0_0_15px_var(--accent-glow)] transform hover:scale-105 transition-all"
                                         isLoading={isFetchingResources}
                                     >
-                                        Stage Swap
+                                        {t('social.chat.stage_swap')}
                                     </Button>
                                     <button
                                         onClick={() => setRemoveModalOpen(true)}
@@ -317,7 +319,7 @@ export const Social: React.FC = () => {
                                 {interactionsLoading ? (
                                     <div className="h-full flex flex-col items-center justify-center opacity-40">
                                         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4" />
-                                        <p className="text-[0.6rem] uppercase font-mono tracking-[0.5em]">Decrypting Interactions...</p>
+                                        <p className="text-[0.6rem] uppercase font-mono tracking-[0.5em]">{t('social.chat.decrypting')}</p>
                                     </div>
                                 ) : (
                                     <div className="max-w-4xl mx-auto space-y-8">
@@ -350,61 +352,62 @@ export const Social: React.FC = () => {
                                                 }
 
                                                 // Trade Interaction Card
-                                                const status = interaction.status || 'pending';
+                                                const statusRaw = interaction.status || 'pending';
+                                                const status = statusRaw.toLowerCase();
                                                 return (
                                                     <div key={`trade-${interaction.id}-${idx}`} className={cn("flex w-full mb-4", isMine ? "justify-end" : "justify-start")}>
                                                         <div className={cn(
                                                             "w-full max-w-md p-6 rounded-2xl border-2 transition-all duration-500 backdrop-blur-md",
-                                                            status === 'pending' ? "bg-white/[0.03] border-white/5 shadow-2xl" :
-                                                                status === 'accepted' ? "bg-primary/[0.02] border-primary/30 shadow-[0_0_30px_var(--accent-glow)]" :
+                                                            status === 'pending' ? "bg-amber-500/[0.03] border-amber-500/20 shadow-2xl" :
+                                                                status === 'accepted' ? "bg-emerald-500/[0.05] border-emerald-500/30 shadow-[0_0_30px_rgba(16,185,129,0.2)]" :
                                                                     "bg-red-500/[0.02] border-red-500/20 opacity-60"
                                                         )}>
                                                             <div className="flex items-center justify-between mb-6">
                                                                 <div className="flex items-center gap-3">
                                                                     <div className={cn("w-1.5 h-1.5 rounded-full animate-pulse",
-                                                                        status === 'pending' ? "bg-yellow-400" : status === 'accepted' ? "bg-primary" : "bg-red-500"
+                                                                        status === 'pending' ? "bg-amber-500" : status === 'accepted' ? "bg-emerald-500" : "bg-red-500"
                                                                     )} />
-                                                                    <h4 className="text-[0.65rem] font-bold uppercase tracking-[0.3em] text-white">Barter Transmission</h4>
+                                                                    <h4 className="text-[0.65rem] font-bold uppercase tracking-[0.3em] text-white">{t('social.interaction.barter')}</h4>
                                                                 </div>
                                                                 <span className={cn(
                                                                     "text-[0.55rem] px-2 py-0.5 rounded-full border font-mono uppercase tracking-widest",
-                                                                    status === 'pending' ? "text-yellow-400 border-yellow-400/30" :
-                                                                        status === 'accepted' ? "text-primary border-primary/30" :
+                                                                    status === 'pending' ? "text-amber-500 border-amber-500/30" :
+                                                                        status === 'accepted' ? "text-emerald-500 border-emerald-500/30" :
                                                                             "text-red-500 border-red-500/30"
                                                                 )}>
                                                                     {status}
                                                                 </span>
                                                             </div>
 
-                                                            <div className="grid grid-cols-2 gap-6 relative">
+                                                            <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center relative">
                                                                 <div className="space-y-2">
-                                                                    <p className="text-[0.55rem] font-mono text-text-muted uppercase tracking-tighter">Providing</p>
+                                                                    <p className="text-[0.55rem] font-mono text-text-muted uppercase tracking-tighter">{t('trade.list.offering')}</p>
                                                                     <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-                                                                        <div className="text-xs font-bold text-white">OUTGOING</div>
-                                                                        <div className="text-[0.6rem] text-text-muted font-mono">{isMine ? 'Your Assets' : `@${selectedFriend.username}'s Assets`}</div>
+                                                                        <div className="text-xs font-bold text-white">{isMine ? t('trade.list.outgoing') : t('trade.list.incoming')}</div>
+                                                                        <div className="text-[0.6rem] text-text-muted font-mono">{isMine ? t('trade.modal.inventory_own') : `@${selectedFriend.username}`}</div>
                                                                     </div>
                                                                 </div>
-                                                                <div className="flex items-center justify-center">
-                                                                    <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-text-muted rotate-90 sm:rotate-0">
+                                                                <div className="flex items-center justify-center pt-5">
+                                                                    <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-text-muted">
                                                                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 3l4 4-4 4" /><path d="M8 21l-4-4 4-4" /><path d="M20 7H4" /><path d="M4 17h16" /></svg>
                                                                     </div>
                                                                 </div>
                                                                 <div className="space-y-2 text-right">
-                                                                    <p className="text-[0.55rem] font-mono text-text-muted uppercase tracking-tighter">Requesting</p>
+                                                                    <p className="text-[0.55rem] font-mono text-text-muted uppercase tracking-tighter">{t('trade.list.receiving')}</p>
                                                                     <div className="p-3 rounded-xl bg-white/5 border border-white/5">
-                                                                        <div className="text-xs font-bold text-white">INCOMING</div>
-                                                                        <div className="text-[0.6rem] text-text-muted font-mono">{!isMine ? 'Your Assets' : `@${selectedFriend.username}'s Assets`}</div>
+                                                                        <div className="text-xs font-bold text-white">{isMine ? t('trade.list.incoming') : t('trade.list.outgoing')}</div>
+                                                                        <div className="text-[0.6rem] text-text-muted font-mono">{!isMine ? t('trade.modal.inventory_own') : `@${selectedFriend.username}`}</div>
                                                                     </div>
                                                                 </div>
                                                             </div>
 
                                                             <div className="mt-6 pt-6 border-t border-white/5 flex gap-3">
                                                                 <Button
-                                                                    variant="secondary"
-                                                                    className="flex-1 h-9 text-[0.6rem] uppercase tracking-widest font-bold bg-white/5 border-white/10"
+                                                                    variant="ghost"
+                                                                    className="flex-1 h-9 text-[0.6rem] uppercase tracking-widest font-bold bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 hover:border-primary/50 transition-all shadow-[0_0_15px_rgba(0,0,0,0.3)] hover:shadow-[0_0_20px_var(--accent-glow)]"
                                                                     onClick={() => handleInspectTrade(interaction.id)}
                                                                 >
-                                                                    Inspect Signal
+                                                                    {t('social.chat.inspect')}
                                                                 </Button>
                                                             </div>
                                                         </div>
@@ -416,7 +419,7 @@ export const Social: React.FC = () => {
                                                 <div className="w-16 h-16 rounded-full border border-dashed border-primary flex items-center justify-center mb-6 animate-pulse">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
                                                 </div>
-                                                <p className="font-mono text-[0.7rem] uppercase tracking-[0.4em]">Channel established. Awaiting signals.</p>
+                                                <p className="font-mono text-[0.7rem] uppercase tracking-[0.4em]">{t('social.empty.channel_ready')}</p>
                                             </div>
                                         )}
                                         <div ref={chatEndRef} />
@@ -431,7 +434,8 @@ export const Social: React.FC = () => {
                                         type="text"
                                         value={msgContent}
                                         onChange={(e) => setMsgContent(e.target.value)}
-                                        placeholder={`Secure transmission to @${selectedFriend?.username}...`}
+
+                                        placeholder={t('social.chat.input_placeholder')}
                                         className="flex-1 bg-transparent border-none px-4 py-3 text-sm text-white font-mono"
                                     />
                                     <Button
@@ -439,7 +443,7 @@ export const Social: React.FC = () => {
                                         disabled={!msgContent.trim() || sendMessage.isPending}
                                         className="h-11 px-8 uppercase tracking-[0.2em] font-bold"
                                     >
-                                        Transmit
+                                        {t('social.chat.send')}
                                     </Button>
                                 </form>
                             </footer>
@@ -450,8 +454,8 @@ export const Social: React.FC = () => {
                                 <div className="absolute inset-0 rounded-full border border-primary/10 animate-ping duration-[3s]" />
                                 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-primary/40"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" /><circle cx="12" cy="12" r="3" /></svg>
                             </div>
-                            <h2 className="text-2xl font-bold text-white mb-2 tracking-widest uppercase">Select Frequency</h2>
-                            <p className="text-text-muted font-mono text-[0.7rem] uppercase tracking-widest max-w-md mx-auto">Inter-node communication requires active frequency matching. Select a synced node from the perimeter to begin transmission.</p>
+                            <h2 className="text-2xl font-bold text-white mb-2 tracking-widest uppercase">{t('social.chat.select_node_title')}</h2>
+                            <p className="text-text-muted font-mono text-[0.7rem] uppercase tracking-widest max-w-md mx-auto">{t('social.chat.select_node_desc')}</p>
                         </div>
                     )}
                 </section>
@@ -465,7 +469,7 @@ export const Social: React.FC = () => {
                     receiverId={selectedFriend.id}
                     receiverUsername={selectedFriend.username}
                     resources={friendResources}
-                    myResources={myResources?.filter((r: any) => r.status === 'available') || []}
+                    myResources={myResources?.filter((r: any) => r.ownerId === session.id && r.status === 'available') || []}
                     defaultAll={false}
                     onSuccess={() => setTradeModalOpen(false)}
                 />
@@ -475,9 +479,9 @@ export const Social: React.FC = () => {
                 isOpen={removeModalOpen}
                 onClose={() => setRemoveModalOpen(false)}
                 onConfirm={handleRemoveConfirm}
-                title="Disconnect Node?"
-                message={`This will permanently sever the neural link with @${selectedFriend?.username}. No further transmission protocol will be possible until re-synced.`}
-                confirmText="Sever Link"
+                title={t('social.chat.disconnect_title')}
+                message={t('social.chat.disconnect_message')}
+                confirmText={t('social.chat.confirm_disconnect')}
                 variant="danger"
                 isLoading={removeFriendHook.isPending}
             />

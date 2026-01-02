@@ -1,23 +1,25 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNotifications, useReadNotification, useReadAllNotifications } from '../hooks/useNotifications';
 import { NotificationDetailModal } from './NotificationDetailModal';
 import { useNavigate } from 'react-router-dom';
 
-const formatTimeAgo = (dateStr: string) => {
+const formatTimeAgo = (dateStr: string, t: any) => {
     const date = new Date(dateStr);
     const now = new Date();
     const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-    if (seconds < 60) return 'just now';
+    if (seconds < 60) return t('notifications.time.just_now');
     const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m ago`;
+    if (minutes < 60) return t('notifications.time.minutes_ago', { count: minutes });
     const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
+    if (hours < 24) return t('notifications.time.hours_ago', { count: hours });
     const days = Math.floor(hours / 24);
-    return `${days}d ago`;
+    return t('notifications.time.days_ago', { count: days });
 };
 
 export const NotificationBell: React.FC = () => {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const [selectedTradeId, setSelectedTradeId] = useState<number | null>(null);
     const [detailModalOpen, setDetailModalOpen] = useState(false);
@@ -68,20 +70,20 @@ export const NotificationBell: React.FC = () => {
                     <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)}></div>
                     <div className="absolute right-0 mt-2 w-80 bg-black border border-glass-surface rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
                         <div className="p-4 border-b border-glass-surface flex justify-between items-center bg-white/5">
-                            <h3 className="text-sm font-bold text-primary">Notifications</h3>
+                            <h3 className="text-sm font-bold text-primary">{t('notifications.title')}</h3>
                             {unreadCount > 0 && (
                                 <button
                                     onClick={() => readAll.mutate()}
                                     className="text-[0.6rem] uppercase tracking-wider text-text-muted hover:text-primary transition-colors"
                                 >
-                                    Mark all as read
+                                    {t('notifications.mark_all')}
                                 </button>
                             )}
                         </div>
                         <div className="max-h-[400px] overflow-y-auto no-scrollbar">
                             {(notifications as any[]).length === 0 ? (
                                 <div className="p-8 text-center">
-                                    <p className="text-xs text-text-muted italic">No notifications yet</p>
+                                    <p className="text-xs text-text-muted italic">{t('notifications.empty')}</p>
                                 </div>
                             ) : (
                                 (notifications as any[]).map((n: any) => (
@@ -99,7 +101,7 @@ export const NotificationBell: React.FC = () => {
                                                 {n.type.replace('TRADE_', '').replace('FRIEND_', 'SOCIAL_')}
                                             </span>
                                             <span className="text-[0.6rem] text-text-muted font-mono">
-                                                {formatTimeAgo(n.createdAt)}
+                                                {formatTimeAgo(n.createdAt, t)}
                                             </span>
                                         </div>
                                         <p className="text-xs text-text leading-relaxed">{n.content}</p>

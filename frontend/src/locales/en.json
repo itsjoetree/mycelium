@@ -1,0 +1,270 @@
+{
+    "common": {
+        "loading": "Loading...",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "delete": "Delete",
+        "save": "Save",
+        "back": "Back",
+        "success": "Success",
+        "error": "Error",
+        "connecting": "Connecting to Mycelium...",
+        "init": "Initializing Neural Uplink..."
+    },
+    "auth": {
+        "title": {
+            "register": "Join the Network",
+            "login": "Access Node"
+        },
+        "fields": {
+            "username": "Username",
+            "username_placeholder": "Choose a handle",
+            "email": "Email",
+            "email_placeholder": "Enter your signal",
+            "password": "Password",
+            "password_placeholder": "*************"
+        },
+        "submit": {
+            "register": "Initialize",
+            "login": "Connect"
+        },
+        "toggle": {
+            "to_login": "Already a node? Login",
+            "to_register": "New structure? Register"
+        },
+        "messages": {
+            "register_success": "Registration successful! Please log in.",
+            "login_success": "Logged in successfully",
+            "failed": "Authentication failed"
+        },
+        "subtitle": "Decentralized Urban Exchange"
+    },
+    "nav": {
+        "dashboard": "Dashboard",
+        "marketplace": "Marketplace",
+        "map": "Map",
+        "social": "Social",
+        "settings": "Settings",
+        "logout": "Logout",
+        "network": "Network",
+        "inventory": "Inventory"
+    },
+    "dashboard": {
+        "title": {
+            "marketplace": "CENTRAL HUB",
+            "inventory": "INVENTORY"
+        },
+        "subtitle": {
+            "marketplace": "Browse Global Resource Signals",
+            "inventory": "Managing Personal Assets"
+        },
+        "header": {
+            "register": "Register New Asset"
+        },
+        "search_placeholder": "Search resources...",
+        "filters": {
+            "all": "All",
+            "seed": "Seed",
+            "compost": "Compost",
+            "harvest": "Harvest",
+            "labor": "Labor"
+        },
+        "view": {
+            "grid": "Grid View",
+            "map": "Map View"
+        },
+        "loading": {
+            "scanning": "Scanning Neural Channels...",
+            "linking": "LINKING NEURAL PERIMETER..."
+        },
+        "sidebar": {
+            "updates": "Network Updates"
+        },
+        "bundle": {
+            "staged": "Protocol Staged",
+            "target": "Target",
+            "abort": "Abort",
+            "initialize": "Initialize Swap",
+            "ready": "Ready For Barter",
+            "select_hint": "Select resources to stage a transmission protocol"
+        },
+        "empty": {
+            "no_signals": "No signals detected",
+            "sector_silent": "Sector silent"
+        },
+        "card": {
+            "node": "Node",
+            "modify": "Modify",
+            "staged": "Staged for Swap",
+            "add": "Add to Proposal"
+        }
+    },
+    "social": {
+        "sidebar": {
+            "title": "Network Signals",
+            "search_placeholder": "Scan Node IDs...",
+            "discovery_title": "Discovery Output",
+            "incoming_title": "Incoming Uplinks",
+            "active_nodes": "Synced Nodes",
+            "connect": "Link",
+            "pulsing": "Pulsing...",
+            "sync": "Sync",
+            "reject": "Reject",
+            "active_link": "ACTIVE_LINK"
+        },
+        "chat": {
+            "select_node": "Select a node to open neural link",
+            "select_node_title": "Select Frequency",
+            "select_node_desc": "Inter-node communication requires active frequency matching. Select a synced node from the perimeter to begin transmission.",
+            "encrypted": "ENCRYPTED_UPLINK",
+            "decrypting": "Decrypting Interactions...",
+            "input_placeholder": "Secure transmission...",
+            "send": "Transmit",
+            "stage_swap": "Stage Swap",
+            "inspect": "Inspect Signal",
+            "disconnect_title": "Disconnect Node?",
+            "disconnect_message": "This will permanently sever the neural link. No further transmission protocol will be possible until re-synced.",
+            "confirm_disconnect": "Sever Link"
+        },
+        "empty": {
+            "no_nodes": "No compatible nodes detected",
+            "isolated": "Isolated. Scan for nodes.",
+            "channel_ready": "Channel established. Awaiting signals."
+        },
+        "toasts": {
+            "request_sent": "Connection request broadcasted",
+            "request_fail": "Broadcast failed",
+            "synced": "Frequency matched. Node synced.",
+            "sync_fail": "Sync failed",
+            "rejected": "Signal rejected",
+            "reject_fail": "Rejection failed",
+            "fetch_fail": "Failed to intercept node resources",
+            "disconnected": "Node disconnected",
+            "disconnect_fail": "Disconnect protocol failed",
+            "transmit_fail": "Failed to transmit message"
+        },
+        "interaction": {
+            "message": "Message Protocol",
+            "barter": "Barter Protocol"
+        }
+    },
+    "trade": {
+        "modal": {
+            "title": "Initiate Barter Protocol",
+            "subtitle": "Synchronizing with Node",
+            "search_friend": "Scan node inventory...",
+            "search_own": "Scan your inventory...",
+            "inventory_node": "Target Inventory",
+            "inventory_own": "Your Offerings",
+            "selected": "SELECTED",
+            "empty_node": "No assets found",
+            "empty_own": "No assets available",
+            "summary_title": "Protocol Summary",
+            "assets_requested": "Assets Requested",
+            "assets_offered": "Assets Offered",
+            "abort": "Abort",
+            "submit": "Commit Proposal",
+            "select_all": "Select All",
+            "request": "Request",
+            "offer": "Offer"
+        },
+        "detail": {
+            "title": "Protocol Inspection",
+            "status_prefix": "Signal #{{id}} Status: {{status}}",
+            "fetching": "Fetching Signal Data...",
+            "initiator": "Initiator",
+            "target": "Target Node",
+            "offered_assets": "Offered Assets",
+            "requested_assets": "Requested Assets",
+            "close": "Close",
+            "abort": "Abort Signal",
+            "decline": "Decline",
+            "finalize": "Finalize Protocol"
+        },
+        "list": {
+            "loading": "Loading activity...",
+            "proposals": "Proposals",
+            "log": "Log",
+            "outgoing": "Outgoing",
+            "incoming": "Incoming",
+            "receiving": "Receiving",
+            "offering": "Offering",
+            "empty_active": "No active proposals",
+            "empty_log": "No historical records",
+            "no_request": "No items requested",
+            "no_offer": "No items offered",
+            "cancel": "Cancel",
+            "decline": "Decline",
+            "accept": "Accept"
+        },
+        "toasts": {
+            "select_resource": "Select at least one resource to request",
+            "broadcasted": "Trade proposal broadcasted across the network",
+            "failed": "Transmission failed",
+            "accepted": "Trade accepted",
+            "accept_fail": "Failed to accept trade",
+            "cancelled": "Trade proposal cancelled",
+            "cancel_fail": "Failed to cancel trade",
+            "declined": "Trade proposal declined",
+            "decline_fail": "Failed to reject trade"
+        }
+    },
+    "resource": {
+        "modal": {
+            "create_title": "Publish New Signal",
+            "edit_title": "Edit Signal",
+            "title_label": "Title",
+            "title_placeholder": "What are you offering?",
+            "quantity_label": "Quantity",
+            "unit_label": "Unit",
+            "unit_placeholder": "kg, liters, hours...",
+            "type_label": "Type",
+            "geo_label": "Geospatial Coordinates",
+            "use_location": "Use My Location",
+            "latitude": "Latitude",
+            "longitude": "Longitude",
+            "cancel": "Cancel",
+            "save": "Save Changes",
+            "publish": "Publish Signal"
+        },
+        "toasts": {
+            "loc_updated": "Location updated",
+            "loc_fail": "Could not fetch location. Please enter manually.",
+            "updated": "Resource updated",
+            "created": "Resource created",
+            "failed": "Operation failed"
+        }
+    },
+    "notifications": {
+        "title": "Notifications",
+        "mark_all": "Mark all as read",
+        "empty": "No notifications yet",
+        "time": {
+            "just_now": "just now",
+            "minutes_ago": "{{count}}m ago",
+            "hours_ago": "{{count}}h ago",
+            "days_ago": "{{count}}d ago"
+        }
+    },
+    "settings": {
+        "title": "Node Configuration",
+        "profile": "Identity & Parameters",
+        "profile_uplink": "Profile Uplink",
+        "bio_label": "Neural Transmission Note (Bio)",
+        "bio_placeholder": "Input signal data...",
+        "theme": "Theme Accent Frequency",
+        "language_protocol": "Language Protocol",
+        "save_changes": "Synchronize Node",
+        "identity": {
+            "title": "Hardcoded Identity Parameters",
+            "system_id": "System ID",
+            "email": "Registration Email",
+            "status": "Node Status: Online"
+        },
+        "danger": {
+            "title": "Terminal Protocol",
+            "text": "Full node decommissioning or core identity reallocation requires central mesh authority. Contact Mesh Command for high-level clearance.",
+            "button": "Request Deletion"
+        }
+    }
+}

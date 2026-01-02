@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { Card } from './ui/Card';
 import { Button } from './ui/Button';
@@ -19,6 +20,7 @@ interface TradeModalProps {
 export const TradeModal: React.FC<TradeModalProps> = ({
     isOpen, onClose, receiverId, receiverUsername, resources, myResources, defaultAll = true, onSuccess
 }) => {
+    const { t } = useTranslation();
     const queryClient = useQueryClient();
     const createTrade = useCreateTrade();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -47,7 +49,7 @@ export const TradeModal: React.FC<TradeModalProps> = ({
 
     const handleTrade = async () => {
         if (selectedFriendResourceIds.length === 0) {
-            toast.error('Select at least one resource to request');
+            toast.error(t('trade.toasts.select_resource'));
             return;
         }
 
@@ -57,7 +59,7 @@ export const TradeModal: React.FC<TradeModalProps> = ({
                 receiverId,
                 resourceIds: [...selectedFriendResourceIds, ...offeredIds]
             });
-            toast.success('Trade proposal broadcasted across the network');
+            toast.success(t('trade.toasts.broadcasted'));
             await Promise.all([
                 queryClient.invalidateQueries({ queryKey: ['trades'] }),
                 queryClient.invalidateQueries({ queryKey: ['resources'] })
@@ -65,7 +67,7 @@ export const TradeModal: React.FC<TradeModalProps> = ({
             onSuccess?.();
             onClose();
         } catch (err: any) {
-            toast.error(err?.message || 'Transmission failed');
+            toast.error(err?.message || t('trade.toasts.failed'));
         } finally {
             setIsSubmitting(false);
         }
@@ -88,8 +90,8 @@ export const TradeModal: React.FC<TradeModalProps> = ({
             <Card className="w-full max-w-5xl border-primary/30 shadow-[0_0_100px_var(--accent-glow)] max-h-[90vh] flex flex-col overflow-hidden bg-background">
                 <div className="p-6 border-b border-glass-surface flex justify-between items-center">
                     <div>
-                        <h3 className="text-xl font-bold text-glow-primary">Initiate Barter Protocol</h3>
-                        <p className="text-text-muted font-mono text-[0.6rem] uppercase mt-1 tracking-widest text-primary/80">Synchronizing with Node @{receiverUsername}</p>
+                        <h3 className="text-xl font-bold text-glow-primary">{t('trade.modal.title')}</h3>
+                        <p className="text-text-muted font-mono text-[0.6rem] uppercase mt-1 tracking-widest text-primary/80">{t('trade.modal.subtitle')} @{receiverUsername}</p>
                     </div>
                     <button onClick={onClose} className="text-text-muted hover:text-white transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -102,9 +104,9 @@ export const TradeModal: React.FC<TradeModalProps> = ({
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_var(--accent)]" />
-                                <h4 className="text-xs uppercase font-bold tracking-widest">Target Inventory</h4>
+                                <h4 className="text-xs uppercase font-bold tracking-widest">{t('trade.modal.inventory_node')}</h4>
                             </div>
-                            <span className="text-[0.6rem] font-mono text-primary/60">{selectedFriendResourceIds.length} SELECTED</span>
+                            <span className="text-[0.6rem] font-mono text-primary/60">{selectedFriendResourceIds.length} {t('trade.modal.selected')}</span>
                         </div>
 
                         <div className="mb-4">
@@ -112,14 +114,14 @@ export const TradeModal: React.FC<TradeModalProps> = ({
                                 type="text"
                                 value={friendSearch}
                                 onChange={(e) => setFriendSearch(e.target.value)}
-                                placeholder="Filter target assets..."
+                                placeholder={t('trade.modal.search_friend')}
                                 className="w-full h-9 bg-black/40 border border-white/5 rounded px-3 text-xs font-mono outline-none focus:border-primary/40 transition-all"
                             />
                         </div>
 
                         <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-2">
                             {filteredFriendResources.length === 0 ? (
-                                <div className="h-full flex items-center justify-center opacity-30 italic text-xs">No assets found</div>
+                                <div className="h-full flex items-center justify-center opacity-30 italic text-xs">{t('trade.modal.empty_node')}</div>
                             ) : (
                                 filteredFriendResources.map(res => (
                                     <button
@@ -154,9 +156,9 @@ export const TradeModal: React.FC<TradeModalProps> = ({
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-secondary shadow-[0_0_10px_#00b7ff]" />
-                                <h4 className="text-xs uppercase font-bold tracking-widest text-secondary">Your Offerings</h4>
+                                <h4 className="text-xs uppercase font-bold tracking-widest text-secondary">{t('trade.modal.inventory_own')}</h4>
                             </div>
-                            <span className="text-[0.6rem] font-mono text-secondary/60">{offeredIds.length} SELECTED</span>
+                            <span className="text-[0.6rem] font-mono text-secondary/60">{offeredIds.length} {t('trade.modal.selected')}</span>
                         </div>
 
                         <div className="mb-4">
@@ -164,14 +166,14 @@ export const TradeModal: React.FC<TradeModalProps> = ({
                                 type="text"
                                 value={mySearch}
                                 onChange={(e) => setMySearch(e.target.value)}
-                                placeholder="Filter your assets..."
+                                placeholder={t('trade.modal.search_own')}
                                 className="w-full h-9 bg-black/40 border border-white/5 rounded px-3 text-xs font-mono outline-none focus:border-secondary/40 transition-all"
                             />
                         </div>
 
                         <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-2">
                             {filteredMyResources.length === 0 ? (
-                                <div className="h-full flex items-center justify-center opacity-30 italic text-xs">No assets available</div>
+                                <div className="h-full flex items-center justify-center opacity-30 italic text-xs">{t('trade.modal.empty_own')}</div>
                             ) : (
                                 filteredMyResources.map(res => (
                                     <button
@@ -204,22 +206,22 @@ export const TradeModal: React.FC<TradeModalProps> = ({
 
                 <div className="p-6 border-t border-glass-surface flex justify-between items-center bg-black/40">
                     <div className="space-y-1">
-                        <p className="text-[0.6rem] text-text-muted uppercase font-mono tracking-widest">Protocol Summary</p>
+                        <p className="text-[0.6rem] text-text-muted uppercase font-mono tracking-widest">{t('trade.modal.summary_title')}</p>
                         <div className="flex items-center gap-4 text-xs font-bold">
-                            <span className="text-primary">{selectedFriendResourceIds.length} Assets Requested</span>
+                            <span className="text-primary">{selectedFriendResourceIds.length} {t('trade.modal.assets_requested')}</span>
                             <span className="w-1 h-1 rounded-full bg-white/20" />
-                            <span className="text-secondary">{offeredIds.length} Assets Offered</span>
+                            <span className="text-secondary">{offeredIds.length} {t('trade.modal.assets_offered')}</span>
                         </div>
                     </div>
                     <div className="flex gap-4">
-                        <Button variant="ghost" onClick={onClose} disabled={isSubmitting} className="uppercase tracking-widest text-[0.7rem] px-6">Abort</Button>
+                        <Button variant="ghost" onClick={onClose} disabled={isSubmitting} className="uppercase tracking-widest text-[0.7rem] px-6">{t('trade.modal.abort')}</Button>
                         <Button
                             onClick={handleTrade}
                             isLoading={isSubmitting}
                             disabled={selectedFriendResourceIds.length === 0}
                             className="uppercase tracking-widest text-[0.7rem] px-8 shadow-[0_0_20px_var(--accent-glow)]"
                         >
-                            Commit Proposal
+                            {t('trade.modal.submit')}
                         </Button>
                     </div>
                 </div>

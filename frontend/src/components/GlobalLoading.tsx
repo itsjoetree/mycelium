@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Logo } from './Logo';
 
-export const GlobalLoading: React.FC<{ message?: string }> = ({ message = 'Connecting to Mycelium...' }) => {
+export const GlobalLoading: React.FC<{ message?: string }> = ({ message }) => {
+    const { t } = useTranslation();
+    const displayMessage = message || t('common.connecting', 'Connecting to Mycelium...');
     const [visible, setVisible] = useState(false);
 
     useEffect(() => {
@@ -31,7 +34,7 @@ export const GlobalLoading: React.FC<{ message?: string }> = ({ message = 'Conne
             </div>
 
             <div className="mt-12 text-center space-y-3">
-                <h2 className="text-white/30 font-mono text-[0.6rem] tracking-[0.6em] uppercase animate-pulse">{message}</h2>
+                <h2 className="text-white/30 font-mono text-[0.6rem] tracking-[0.6em] uppercase animate-pulse">{displayMessage}</h2>
                 <div className="flex gap-1.5 justify-center">
                     <div className="w-1 h-1 bg-white/20 rounded-full animate-bounce [animation-delay:-0.3s]" />
                     <div className="w-1 h-1 bg-white/20 rounded-full animate-bounce [animation-delay:-0.15s]" />

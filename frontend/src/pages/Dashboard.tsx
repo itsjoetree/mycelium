@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useResources, useDeleteResource } from '../hooks/useResources';
 import { useUserSession } from '../hooks/useAuth';
 import { Card } from '../components/ui/Card';
@@ -21,6 +22,7 @@ function cn(...inputs: any[]) {
 }
 
 export const Dashboard: React.FC = () => {
+    const { t } = useTranslation();
     useWebSocket();
     const { data: session, isLoading: sessionLoading } = useUserSession();
     const [searchParams] = useSearchParams();
@@ -58,7 +60,7 @@ export const Dashboard: React.FC = () => {
 
     const toggleBundleItem = (res: any) => {
         if (res.ownerId === session?.id) {
-            toast.error("You already own this resource");
+            toast.error(t('common.error'));
             return;
         }
 
@@ -98,7 +100,7 @@ export const Dashboard: React.FC = () => {
         if (!resourceToDelete) return;
         try {
             await deleteResource.mutateAsync(resourceToDelete);
-            toast.success("Signal removed");
+            toast.success(t('common.success'));
             setDeleteModalOpen(false);
             setResourceToDelete(null);
         } catch (err: any) {
@@ -106,7 +108,7 @@ export const Dashboard: React.FC = () => {
         }
     };
 
-    if (sessionLoading) return <GlobalLoading message="LINKING NEURAL PERIMETER..." />;
+    if (sessionLoading) return <GlobalLoading message={t('dashboard.loading.linking')} />;
     if (!session) return null;
 
     const marketplaceResources = resources?.filter((r: any) => r.ownerId !== session.id && r.status === 'available') || [];
@@ -120,17 +122,17 @@ export const Dashboard: React.FC = () => {
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
                         <div>
                             <h1 className="text-4xl font-bold tracking-tight text-white mb-2">
-                                {view === 'marketplace' ? 'CENTRAL HUB' : 'INVENTORY'}
+                                {view === 'marketplace' ? t('dashboard.title.marketplace') : t('dashboard.title.inventory')}
                             </h1>
                             <p className="text-text-muted font-mono text-[0.6rem] uppercase tracking-[0.4em]">
-                                {view === 'marketplace' ? 'Browse Global Resource Signals' : 'Managing Personal Assets'}
+                                {view === 'marketplace' ? t('dashboard.subtitle.marketplace') : t('dashboard.subtitle.inventory')}
                             </p>
                         </div>
                         <Button
                             onClick={() => setResourceModalOpen(true)}
                             className="scale-105"
                         >
-                            Register New Asset
+                            {t('dashboard.header.register')}
                         </Button>
                     </div>
 
@@ -146,9 +148,9 @@ export const Dashboard: React.FC = () => {
                                     </div>
                                     <input
                                         type="text"
-                                        placeholder="Scan resource frequencies..."
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
+                                        placeholder={t('dashboard.search_placeholder', 'Search resources...')}
                                         className="w-full bg-white/5 border border-glass-surface rounded-xl py-3 pl-10 pr-4 text-sm font-mono"
                                     />
                                 </div>
@@ -162,7 +164,7 @@ export const Dashboard: React.FC = () => {
                                                     ? 'bg-primary/20 border-primary text-primary shadow-[0_0_15px_var(--accent-glow)]'
                                                     : 'bg-black/40 border-glass-surface text-text-muted hover:border-text-muted'}`}
                                         >
-                                            {type}s
+                                            {t(`dashboard.filters.${type}`, type)}s
                                         </button>
                                     ))}
                                 </div>
@@ -171,21 +173,21 @@ export const Dashboard: React.FC = () => {
                             <div className="flex items-center justify-between border-b border-glass-surface pb-4">
                                 <h2 className="text-xl font-bold flex items-center gap-3">
                                     <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_var(--accent)]" />
-                                    <span className="tracking-widest capitalize">{view} Grid</span>
+                                    <span className="tracking-widest capitalize">{view} {t('dashboard.view.grid', 'Grid')}</span>
                                 </h2>
                                 {view === 'marketplace' && (
                                     <div className="flex gap-2 p-1 bg-white/5 rounded-lg border border-glass-surface">
                                         <button
                                             onClick={() => setDisplayMode('grid')}
                                             className={`p-2 rounded-md transition-all ${displayMode === 'grid' ? 'bg-primary/20 text-primary shadow-inner' : 'text-text-muted hover:text-text'}`}
-                                            title="Grid View"
+                                            title={t('dashboard.view.grid', "Grid View")}
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /></svg>
                                         </button>
                                         <button
                                             onClick={() => setDisplayMode('map')}
                                             className={`p-2 rounded-md transition-all ${displayMode === 'map' ? 'bg-primary/20 text-primary shadow-inner' : 'text-text-muted hover:text-text'}`}
-                                            title="Map View"
+                                            title={t('dashboard.view.map', "Map View")}
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
                                         </button>
@@ -213,13 +215,13 @@ export const Dashboard: React.FC = () => {
                                                 ))}
                                             </div>
                                             <div>
-                                                <h4 className="text-sm font-bold text-white uppercase tracking-widest">Protocol Staged</h4>
-                                                <p className="text-[0.6rem] text-primary font-mono uppercase">Target: @{tradeBundle[0].ownerUsername || 'NODE_' + tradeBundle[0].ownerId}</p>
+                                                <h4 className="text-sm font-bold text-white uppercase tracking-widest">{t('dashboard.bundle.staged', 'Protocol Staged')}</h4>
+                                                <p className="text-[0.6rem] text-primary font-mono uppercase">{t('dashboard.bundle.target', 'Target')}: @{tradeBundle[0].ownerUsername || 'NODE_' + tradeBundle[0].ownerId}</p>
                                             </div>
                                         </div>
                                         <div className="flex gap-3">
-                                            <Button variant="ghost" className="text-[0.6rem] h-9 px-4 uppercase tracking-widest border-white/10" onClick={clearBundle}>Abort</Button>
-                                            <Button className="text-[0.6rem] h-9 px-8 uppercase tracking-[0.2em] font-bold" onClick={openTrade}>Initialize Swap</Button>
+                                            <Button variant="ghost" className="text-[0.6rem] h-9 px-4 uppercase tracking-widest border-white/10" onClick={clearBundle}>{t('dashboard.bundle.abort', 'Abort')}</Button>
+                                            <Button className="text-[0.6rem] h-9 px-8 uppercase tracking-[0.2em] font-bold" onClick={openTrade}>{t('dashboard.bundle.initialize', 'Initialize Swap')}</Button>
                                         </div>
                                     </>
                                 ) : (
@@ -228,8 +230,8 @@ export const Dashboard: React.FC = () => {
                                             <div className="w-2 h-2 rounded-full bg-white/5 animate-pulse" />
                                         </div>
                                         <div>
-                                            <h4 className="text-[0.6rem] font-bold text-text-muted uppercase tracking-[0.2em]">Ready For Barter</h4>
-                                            <p className="text-[0.55rem] text-text-muted/60 italic font-mono uppercase tracking-tighter">Select resources to stage a transmission protocol</p>
+                                            <h4 className="text-[0.6rem] font-bold text-text-muted uppercase tracking-[0.2em]">{t('dashboard.bundle.ready')}</h4>
+                                            <p className="text-[0.55rem] text-text-muted/60 italic font-mono uppercase tracking-tighter">{t('dashboard.bundle.select_hint')}</p>
                                         </div>
                                     </div>
                                 )}
@@ -240,15 +242,15 @@ export const Dashboard: React.FC = () => {
                                     {resourcesLoading ? (
                                         <div className="col-span-full py-20 text-center">
                                             <div className="inline-block w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4" />
-                                            <p className="font-mono text-[0.7rem] uppercase text-primary animate-pulse tracking-widest">Scanning Neural Channels...</p>
+                                            <p className="font-mono text-[0.7rem] uppercase text-primary animate-pulse tracking-widest">{t('dashboard.loading.scanning')}</p>
                                         </div>
                                     ) : displayResources.length === 0 ? (
                                         <div className="col-span-full py-20 text-center border-2 border-dashed border-white/5 rounded-2xl bg-white/[0.02]">
                                             <div className="mb-4 opacity-20 flex justify-center text-primary">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M2 12h20" /><path d="m4.93 4.93 14.14 14.14" /><path d="m4.93 19.07 14.14-14.14" /></svg>
                                             </div>
-                                            <p className="text-text-muted font-mono mb-2 uppercase tracking-widest text-sm">No signals detected</p>
-                                            <p className="text-[0.6rem] text-text-muted/40 uppercase tracking-[0.4em]">Sector silent</p>
+                                            <p className="text-text-muted font-mono mb-2 uppercase tracking-widest text-sm">{t('dashboard.empty.no_signals')}</p>
+                                            <p className="text-[0.6rem] text-text-muted/40 uppercase tracking-[0.4em]">{t('dashboard.empty.sector_silent')}</p>
                                         </div>
                                     ) : displayResources.map((res: any) => (
                                         <Card key={res.id} className="group hover:-translate-y-2 transition-all duration-500 border-white/5 hover:border-primary/40 bg-white/[0.02] hover:bg-white/[0.05] p-5 !rounded-2xl shadow-2xl relative overflow-hidden">
@@ -286,7 +288,7 @@ export const Dashboard: React.FC = () => {
                                                             className="flex-1 text-[0.65rem] h-10 uppercase tracking-widest font-bold bg-primary/10 border-primary/20 hover:bg-primary/20 text-primary"
                                                             onClick={() => openEdit(res)}
                                                         >
-                                                            Modify
+                                                            {t('dashboard.card.modify')}
                                                         </Button>
                                                         <Button
                                                             variant="ghost"
@@ -308,7 +310,7 @@ export const Dashboard: React.FC = () => {
                                                         onClick={() => toggleBundleItem(res)}
                                                         disabled={res.status !== 'available'}
                                                     >
-                                                        {tradeBundle.find(item => item.id === res.id) ? "Staged for Swap" : "Add to Proposal"}
+                                                        {tradeBundle.find(item => item.id === res.id) ? t('dashboard.card.staged') : t('dashboard.card.add')}
                                                     </Button>
                                                 )}
                                             </div>
@@ -331,7 +333,7 @@ export const Dashboard: React.FC = () => {
                                 <div className="p-1 px-4 border-l-2 border-primary bg-primary/5">
                                     <h2 className="text-xs font-bold uppercase tracking-[0.3em] flex items-center gap-2">
                                         <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_var(--accent)]" />
-                                        Network Updates
+                                        {t('dashboard.sidebar.updates')}
                                     </h2>
                                 </div>
                                 <div className="max-h-[70vh] overflow-y-auto no-scrollbar pr-1">

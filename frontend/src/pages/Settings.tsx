@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useUserSession } from '../hooks/useAuth';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -7,6 +8,7 @@ import { toast } from 'sonner';
 import { GlobalLoading } from '../components/GlobalLoading';
 
 export const Settings: React.FC = () => {
+    const { t, i18n } = useTranslation();
     const { data: session, isLoading: sessionLoading } = useUserSession();
     const { data: profile, isLoading: profileLoading } = useMyProfile();
     const updateProfile = useUpdateProfile();
@@ -38,8 +40,8 @@ export const Settings: React.FC = () => {
     return (
         <div className="flex-1 p-6 md:p-10 pt-8 bg-black h-full overflow-y-auto custom-scrollbar">
             <header className="max-w-4xl mx-auto mb-10">
-                <h1 className="text-4xl font-bold tracking-tight text-white mb-2 uppercase">Node Config</h1>
-                <p className="text-text-muted font-mono text-[0.6rem] uppercase tracking-[0.4em]">Identity & Parameters</p>
+                <h1 className="text-4xl font-bold tracking-tight text-white mb-2 uppercase">{t('settings.title')}</h1>
+                <p className="text-text-muted font-mono text-[0.6rem] uppercase tracking-[0.4em]">{t('settings.profile')}</p>
             </header>
 
             <main className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
@@ -58,25 +60,25 @@ export const Settings: React.FC = () => {
                             <span className="font-mono text-4xl uppercase font-bold">{session.username[0]}</span>
                         </div>
                         <h2 className="text-xl font-bold text-white relative z-10">@{session.username}</h2>
-                        <p className="text-primary font-mono text-[0.6rem] mt-2 uppercase tracking-widest relative z-10">Node Status: Online</p>
+                        <p className="text-primary font-mono text-[0.6rem] mt-2 uppercase tracking-widest relative z-10">{t('settings.identity.status', 'Node Status: Online')}</p>
                     </Card>
                 </div>
 
                 <div className="md:col-span-2 space-y-8">
                     <Card className="p-8 border-white/5 bg-white/[0.02] !rounded-2xl shadow-2xl">
-                        <h3 className="mb-6 text-primary tracking-[0.3em] font-bold text-xs uppercase" style={{ color: themeColor }}>Profile Uplink</h3>
+                        <h3 className="mb-6 text-primary tracking-[0.3em] font-bold text-xs uppercase" style={{ color: themeColor }}>{t('settings.profile_uplink', 'Profile Uplink')}</h3>
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-[0.6rem] uppercase text-text-muted mb-2 font-bold tracking-widest">Neural Transmission Note (Bio)</label>
+                                <label className="block text-[0.6rem] uppercase text-text-muted mb-2 font-bold tracking-widest">{t('settings.bio_label', 'Neural Transmission Note (Bio)')}</label>
                                 <textarea
                                     value={bio}
                                     onChange={(e) => setBio(e.target.value)}
-                                    placeholder="Input signal data..."
+                                    placeholder={t('settings.bio_placeholder', 'Input signal data...')}
                                     className="w-full bg-black/40 border border-white/5 px-4 py-4 rounded-xl text-text-main font-mono text-xs h-32 resize-none"
                                 />
                             </div>
                             <div>
-                                <label className="block text-[0.6rem] uppercase text-text-muted mb-3 font-bold tracking-widest">Theme Accent Frequency</label>
+                                <label className="block text-[0.6rem] uppercase text-text-muted mb-3 font-bold tracking-widest">{t('settings.theme', 'Visual Protocol')}</label>
                                 <div className="grid grid-cols-5 gap-2">
                                     {[
                                         { color: '#00ff9d', name: 'Neon Mycelium' },
@@ -89,8 +91,8 @@ export const Settings: React.FC = () => {
                                             key={theme.color}
                                             onClick={() => setThemeColor(theme.color)}
                                             className={`group relative flex flex-col items-center gap-2 p-2 rounded-xl border transition-all duration-300 ${themeColor === theme.color
-                                                    ? 'bg-white/10 border-white/20 ring-1 ring-white/20'
-                                                    : 'bg-transparent border-transparent hover:bg-white/5'
+                                                ? 'bg-white/10 border-white/20 ring-1 ring-white/20'
+                                                : 'bg-transparent border-transparent hover:bg-white/5'
                                                 }`}
                                         >
                                             <div
@@ -108,39 +110,59 @@ export const Settings: React.FC = () => {
                                     ))}
                                 </div>
                             </div>
+                            <div>
+                                <label className="block text-[0.6rem] uppercase text-text-muted mb-3 font-bold tracking-widest">{t('settings.language_protocol', 'Language Protocol')}</label>
+                                <div className="grid grid-cols-3 gap-2">
+                                    {[
+                                        { code: 'en', name: 'English' },
+                                        { code: 'es', name: 'Español' },
+                                        { code: 'fr', name: 'Français' },
+                                    ].map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            onClick={() => i18n.changeLanguage(lang.code)}
+                                            className={`py-3 rounded-xl border transition-all duration-300 font-mono text-[0.6rem] uppercase tracking-wider ${(i18n.resolvedLanguage || 'en') === lang.code
+                                                ? 'bg-white/10 border-white/20 text-white shadow-inner'
+                                                : 'bg-transparent border-transparent text-text-muted hover:bg-white/5 hover:text-white'
+                                                }`}
+                                        >
+                                            {lang.name}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
                             <Button
                                 onClick={handleSave}
                                 className="w-full h-12 text-sm uppercase tracking-[0.2em] font-bold shadow-[0_0_15px_var(--accent-glow)] mt-4"
                                 isLoading={updateProfile.isPending}
                                 style={{ backgroundColor: themeColor + '11', borderColor: themeColor + '44', color: themeColor }}
                             >
-                                Synchronize Node
+                                {t('settings.save_changes')}
                             </Button>
                         </div>
                     </Card>
 
                     <Card className="p-8 border-white/5 bg-white/[0.01] !rounded-2xl shadow-xl opacity-60">
-                        <h3 className="mb-6 text-text-muted uppercase tracking-widest text-[0.6rem] font-bold">Hardcoded Identity Parameters</h3>
+                        <h3 className="mb-6 text-text-muted uppercase tracking-widest text-[0.6rem] font-bold">{t('settings.identity.title', 'Hardcoded Identity Parameters')}</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div>
-                                <label className="block text-[0.55rem] uppercase text-text-muted mb-1 font-bold tracking-tighter">System ID</label>
+                                <label className="block text-[0.55rem] uppercase text-text-muted mb-1 font-bold tracking-tighter">{t('settings.identity.system_id', 'System ID')}</label>
                                 <div className="font-mono text-xs text-white">#NODE_{session.id.toString().padStart(4, '0')}</div>
                             </div>
                             <div>
-                                <label className="block text-[0.55rem] uppercase text-text-muted mb-1 font-bold tracking-tighter">Registration Email</label>
+                                <label className="block text-[0.55rem] uppercase text-text-muted mb-1 font-bold tracking-tighter">{t('settings.identity.email', 'Registration Email')}</label>
                                 <div className="font-mono text-xs text-white truncate">{session.email}</div>
                             </div>
                         </div>
                     </Card>
 
                     <div className="p-6 border border-red-500/10 bg-red-500/5 rounded-2xl">
-                        <h3 className="mb-3 text-red-500 uppercase tracking-widest text-[0.6rem] font-bold">Terminal protocol</h3>
+                        <h3 className="mb-3 text-red-500 uppercase tracking-widest text-[0.6rem] font-bold">{t('settings.danger.title', 'Terminal protocol')}</h3>
                         <p className="text-[0.6rem] text-text-muted mb-4 font-mono leading-relaxed">
-                            Full node decommissioning or core identity reallocation requires central mesh authority.
-                            Contact Mesh Command for high-level clearance.
+                            {t('settings.danger.text')}
                         </p>
                         <Button variant="secondary" className="border-red-500/20 text-red-500/60 bg-transparent hover:bg-red-500/10 hover:text-red-500 text-[0.6rem] h-8 px-4 font-bold uppercase tracking-widest" disabled>
-                            Request Deletion
+                            {t('settings.danger.button', 'Request Deletion')}
                         </Button>
                     </div>
                 </div>

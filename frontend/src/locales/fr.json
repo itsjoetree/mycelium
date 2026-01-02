@@ -1,0 +1,270 @@
+{
+    "common": {
+        "loading": "Chargement...",
+        "cancel": "Annuler",
+        "confirm": "Confirmer",
+        "delete": "Supprimer",
+        "save": "Enregistrer",
+        "back": "Retour",
+        "success": "Succès",
+        "error": "Erreur",
+        "connecting": "Connexion à Mycelium...",
+        "init": "Initialisation Liaison Neurale..."
+    },
+    "auth": {
+        "title": {
+            "register": "Rejoindre le Réseau",
+            "login": "Accès Nœud"
+        },
+        "fields": {
+            "username": "Utilisateur",
+            "username_placeholder": "Choisir un pseudo",
+            "email": "Email",
+            "email_placeholder": "Entrez votre signal",
+            "password": "Mot de passe",
+            "password_placeholder": "*************"
+        },
+        "submit": {
+            "register": "Initialiser",
+            "login": "Connecter"
+        },
+        "toggle": {
+            "to_login": "Déjà un nœud ? Connexion",
+            "to_register": "Nouvelle structure ? S'inscrire"
+        },
+        "messages": {
+            "register_success": "Inscription réussie ! Veuillez vous connecter.",
+            "login_success": "Connexion réussie",
+            "failed": "Authentification échouée"
+        },
+        "subtitle": "Échange Urbain Décentralisé"
+    },
+    "nav": {
+        "dashboard": "Tableau de bord",
+        "marketplace": "Marché",
+        "map": "Carte",
+        "social": "Social",
+        "settings": "Paramètres",
+        "logout": "Déconnexion",
+        "network": "Réseau",
+        "inventory": "Inventaire"
+    },
+    "dashboard": {
+        "title": {
+            "marketplace": "HUB CENTRAL",
+            "inventory": "INVENTAIRE"
+        },
+        "subtitle": {
+            "marketplace": "Parcourir Signaux d'Actifs",
+            "inventory": "Gestion des Actifs Personnels"
+        },
+        "header": {
+            "register": "Enregistrer Nouvel Actif"
+        },
+        "search_placeholder": "Rechercher des ressources...",
+        "filters": {
+            "all": "Tout",
+            "seed": "Graine",
+            "compost": "Compost",
+            "harvest": "Récolte",
+            "labor": "Travail"
+        },
+        "view": {
+            "grid": "Vue Grille",
+            "map": "Vue Carte"
+        },
+        "loading": {
+            "scanning": "Scan des Canaux Neuraux...",
+            "linking": "LIAISON PÉRIMÈTRE NEURAL..."
+        },
+        "sidebar": {
+            "updates": "Mises à jour Réseau"
+        },
+        "bundle": {
+            "staged": "Protocole Préparé",
+            "target": "Cible",
+            "abort": "Annuler",
+            "initialize": "Initier l'Échange",
+            "ready": "Prêt pour le Troc",
+            "select_hint": "Sélectionnez des ressources pour le protocole"
+        },
+        "empty": {
+            "no_signals": "Aucun signal détecté",
+            "sector_silent": "Secteur silencieux"
+        },
+        "card": {
+            "node": "Nœud",
+            "modify": "Modifier",
+            "staged": "Préparé pour Échange",
+            "add": "Ajouter à la Proposition"
+        }
+    },
+    "social": {
+        "sidebar": {
+            "title": "Signaux Réseau",
+            "search_placeholder": "Scanner IDs de Nœud...",
+            "discovery_title": "Sortie Découverte",
+            "incoming_title": "Liaisons Entrantes",
+            "active_nodes": "Nœuds Synchronisés",
+            "connect": "Lier",
+            "pulsing": "Pulsation...",
+            "sync": "Sync",
+            "reject": "Rejeter",
+            "active_link": "LIEN_ACTIF"
+        },
+        "chat": {
+            "select_node": "Sélectionner un nœud pour lien neural",
+            "select_node_title": "Sélectionner Fréquence",
+            "select_node_desc": "La communication inter-nœuds nécessite une correspondance de fréquence active. Sélectionnez un nœud synchronisé du périmètre pour commencer.",
+            "encrypted": "LIAISON_CHIFFRÉE",
+            "decrypting": "Déchiffrement Interactions...",
+            "input_placeholder": "Transmission sécurisée...",
+            "send": "Transmettre",
+            "stage_swap": "Préparer Échange",
+            "inspect": "Inspecter Signal",
+            "disconnect_title": "Déconnecter Nœud ?",
+            "disconnect_message": "Cela coupera définitivement le lien neural. Aucune transmission ne sera possible avant re-synchronisation.",
+            "confirm_disconnect": "Couper Lien"
+        },
+        "empty": {
+            "no_nodes": "Aucun nœud compatible détecté",
+            "isolated": "Isolé. Scannez les nœuds.",
+            "channel_ready": "Canal établi. En attente de signaux."
+        },
+        "toasts": {
+            "request_sent": "Demande de connexion diffusée",
+            "request_fail": "Diffusion échouée",
+            "synced": "Fréquence correspondante. Nœud synchronisé.",
+            "sync_fail": "Synchronisation échouée",
+            "rejected": "Signal rejeté",
+            "reject_fail": "Rejet échoué",
+            "fetch_fail": "Échec interception ressources nœud",
+            "disconnected": "Nœud déconnecté",
+            "disconnect_fail": "Échec protocole déconnexion",
+            "transmit_fail": "Échec transmission message"
+        },
+        "interaction": {
+            "message": "Protocole Message",
+            "barter": "Protocole Troc"
+        }
+    },
+    "trade": {
+        "modal": {
+            "title": "Initier Protocole Troc",
+            "subtitle": "Synchronisation avec Nœud",
+            "search_friend": "Scanner inventaire...",
+            "search_own": "Scanner votre inventaire...",
+            "inventory_node": "Inventaire Cible",
+            "inventory_own": "Vos Offres",
+            "selected": "SÉLECTIONNÉ",
+            "empty_node": "Aucun actif trouvé",
+            "empty_own": "Aucun actif disponible",
+            "summary_title": "Résumé Protocole",
+            "assets_requested": "Actifs Demandés",
+            "assets_offered": "Actifs Offerts",
+            "abort": "Avorter",
+            "submit": "Confirmer Proposition",
+            "select_all": "Tout Sélectionner",
+            "request": "Demander",
+            "offer": "Offrir"
+        },
+        "detail": {
+            "title": "Inspection Protocol",
+            "status_prefix": "Signal #{{id}} État : {{status}}",
+            "fetching": "Récupération Données Signal...",
+            "initiator": "Initiateur",
+            "target": "Nœud Cible",
+            "offered_assets": "Actifs Offerts",
+            "requested_assets": "Actifs Demandés",
+            "close": "Fermer",
+            "abort": "Avorter Signal",
+            "decline": "Refuser",
+            "finalize": "Finaliser Protocole"
+        },
+        "list": {
+            "loading": "Chargement activité...",
+            "proposals": "Propositions",
+            "log": "Journal",
+            "outgoing": "Sortant",
+            "incoming": "Entrant",
+            "receiving": "Réception",
+            "offering": "Offre",
+            "empty_active": "Aucune proposition active",
+            "empty_log": "Aucun historique",
+            "no_request": "Aucun objet demandé",
+            "no_offer": "Aucun objet offert",
+            "cancel": "Annuler",
+            "decline": "Refuser",
+            "accept": "Accepter"
+        },
+        "toasts": {
+            "select_resource": "Sélectionnez au moins une ressource",
+            "broadcasted": "Proposition échange diffusée sur le réseau",
+            "failed": "Transmission échouée",
+            "accepted": "Échange accepté",
+            "accept_fail": "Échec acceptation",
+            "cancelled": "Proposition annulée",
+            "cancel_fail": "Échec annulation",
+            "declined": "Proposition refusée",
+            "decline_fail": "Échec refus"
+        }
+    },
+    "resource": {
+        "modal": {
+            "create_title": "Publier Nouveau Signal",
+            "edit_title": "Modifier Signal",
+            "title_label": "Titre",
+            "title_placeholder": "Que proposez-vous ?",
+            "quantity_label": "Quantité",
+            "unit_label": "Unité",
+            "unit_placeholder": "kg, litres, heures...",
+            "type_label": "Type",
+            "geo_label": "Coordonnées Géospatiales",
+            "use_location": "Utiliser Ma Position",
+            "latitude": "Latitude",
+            "longitude": "Longitude",
+            "cancel": "Annuler",
+            "save": "Enregistrer",
+            "publish": "Publier Signal"
+        },
+        "toasts": {
+            "loc_updated": "Position mise à jour",
+            "loc_fail": "Impossible de récupérer position. Entrer manuellement.",
+            "updated": "Ressource mise à jour",
+            "created": "Ressource créée",
+            "failed": "Opération échouée"
+        }
+    },
+    "notifications": {
+        "title": "Notifications",
+        "mark_all": "Tout marquer comme lu",
+        "empty": "Aucune notification",
+        "time": {
+            "just_now": "à l'instant",
+            "minutes_ago": "il y a {{count}}m",
+            "hours_ago": "il y a {{count}}h",
+            "days_ago": "il y a {{count}}j"
+        }
+    },
+    "settings": {
+        "title": "Configuration du Nœud",
+        "profile": "Identité et Paramètres",
+        "profile_uplink": "Liaison de Profil",
+        "bio_label": "Note de Transmission Neurale (Bio)",
+        "bio_placeholder": "Entrée de données de signal...",
+        "theme": "Fréquence d'Accent Visuel",
+        "language_protocol": "Protocole Linguistique",
+        "save_changes": "Enregistrer Configuration",
+        "identity": {
+            "title": "Paramètres d'Identité Statique",
+            "system_id": "ID Système",
+            "email": "Email d'Enregistrement",
+            "status": "État du Nœud : En Ligne"
+        },
+        "danger": {
+            "title": "Protocole Terminal",
+            "text": "Le démantèlement complet du nœud nécessite l'autorité centrale du maillage. Contactez le Commandement du Maillage.",
+            "button": "Demander la Suppression"
+        }
+    }
+}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card } from './ui/Card';
 import { Button } from './ui/Button';
 
@@ -20,11 +21,15 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     onConfirm,
     title,
     message,
-    confirmText = 'Confirm',
-    cancelText = 'Cancel',
+    confirmText,
+    cancelText,
     isLoading = false,
     variant = 'primary'
 }) => {
+    const { t } = useTranslation();
+    const finalConfirmText = confirmText || t('common.confirm');
+    const finalCancelText = cancelText || t('common.cancel');
+
     if (!isOpen) return null;
 
     return (
@@ -36,14 +41,14 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                 </p>
                 <div className="flex justify-end gap-3">
                     <Button variant="ghost" onClick={onClose} disabled={isLoading}>
-                        {cancelText}
+                        {finalCancelText}
                     </Button>
                     <Button
                         onClick={onConfirm}
                         isLoading={isLoading}
                         className={variant === 'danger' ? 'bg-red-500/20 text-red-500 border-red-500/50 hover:bg-red-500/30' : ''}
                     >
-                        {confirmText}
+                        {finalConfirmText}
                     </Button>
                 </div>
             </Card>

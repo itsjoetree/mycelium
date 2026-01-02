@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTradesList, useAcceptTrade, useCancelTrade, useRejectTrade } from '../hooks/useTrades';
 import { useQueryClient } from '@tanstack/react-query';
 import { useUserSession } from '../hooks/useAuth';
@@ -7,6 +8,7 @@ import { Button } from './ui/Button';
 import { toast } from 'sonner';
 
 export const TradesList: React.FC = () => {
+    const { t } = useTranslation();
     const { data: session } = useUserSession();
     const { data: trades, isLoading } = useTradesList();
     const acceptTrade = useAcceptTrade();
@@ -19,37 +21,37 @@ export const TradesList: React.FC = () => {
     const handleAccept = async (id: number) => {
         try {
             await acceptTrade.mutateAsync(id);
-            toast.success('Trade accepted');
+            toast.success(t('trade.toasts.accepted'));
             queryClient.invalidateQueries({ queryKey: ['trades'] });
             queryClient.invalidateQueries({ queryKey: ['resources'] });
         } catch (err: any) {
-            toast.error(err?.message || 'Failed to accept trade');
+            toast.error(err?.message || t('trade.toasts.accept_fail'));
         }
     };
 
     const handleCancel = async (id: number) => {
         try {
             await cancelTrade.mutateAsync(id);
-            toast.info('Trade proposal cancelled');
+            toast.info(t('trade.toasts.cancelled'));
             queryClient.invalidateQueries({ queryKey: ['trades'] });
             queryClient.invalidateQueries({ queryKey: ['resources'] });
         } catch (err: any) {
-            toast.error(err?.message || 'Failed to cancel trade');
+            toast.error(err?.message || t('trade.toasts.cancel_fail'));
         }
     };
 
     const handleReject = async (id: number) => {
         try {
             await rejectTrade.mutateAsync(id);
-            toast.info('Trade proposal declined');
+            toast.info(t('trade.toasts.declined'));
             queryClient.invalidateQueries({ queryKey: ['trades'] });
             queryClient.invalidateQueries({ queryKey: ['resources'] });
         } catch (err: any) {
-            toast.error(err?.message || 'Failed to reject trade');
+            toast.error(err?.message || t('trade.toasts.decline_fail'));
         }
     };
 
-    if (isLoading) return <div className="text-text-muted font-mono text-xs p-4 text-center">Loading activity...</div>;
+    if (isLoading) return <div className="text-text-muted font-mono text-xs p-4 text-center">{t('trade.list.loading')}</div>;
 
     const activeTrades = trades?.filter((t: any) => t.status === 'PENDING') || [];
     const historicalTrades = trades?.filter((t: any) => t.status !== 'PENDING') || [];
@@ -65,7 +67,7 @@ export const TradesList: React.FC = () => {
                             ? 'bg-secondary/20 text-secondary border-secondary/30 shadow-[0_0_10px_rgba(0,183,255,0.1)]'
                             : 'border-transparent text-text-muted hover:text-text hover:bg-white/5'}`}
                 >
-                    Proposals ({activeTrades.length})
+                    {t('trade.list.proposals')} ({activeTrades.length})
                 </button>
                 <button
                     onClick={() => setView('log')}
@@ -74,13 +76,13 @@ export const TradesList: React.FC = () => {
                             ? 'bg-primary/20 text-primary border-primary/30 shadow-[0_0_10px_rgb(var(--accent-rgb)/0.1)]'
                             : 'border-transparent text-text-muted hover:text-text hover:bg-white/5'}`}
                 >
-                    Log ({historicalTrades.length})
+                    {t('trade.list.log')} ({historicalTrades.length})
                 </button>
             </div>
 
             {displayTrades.length === 0 ? (
                 <div className="text-text-muted font-mono text-[10px] p-8 text-center border border-dashed border-glass-surface rounded-sm">
-                    No {view} records found
+                    {view === 'active' ? t('trade.list.empty_active') : t('trade.list.empty_log')}
                 </div>
             ) : (
                 <div className="space-y-3">
@@ -94,25 +96,28 @@ export const TradesList: React.FC = () => {
                                 <div className="flex justify-between items-start mb-2">
                                     <div>
                                         <div className="text-[0.6rem] uppercase tracking-tighter text-text-muted mb-1">
-                                            {isInitiator ? 'Outgoing' : 'Incoming'}
+                                            {isInitiator ? t('trade.list.outgoing') : t('trade.list.incoming')}
                                             {view === 'log' && ` • ${trade.status}`}
                                         </div>
                                         <div className="font-mono text-xs font-bold text-primary">@{otherParty}</div>
                                     </div>
                                     {view === 'active' && (
-                                        <span className="text-[0.6rem] px-1.5 py-0.5 rounded border border-secondary/30 text-secondary font-bold">
+                                        <span className={`text-[0.6rem] px-2 py-0.5 rounded border font-bold uppercase tracking-wider
+                                            ${trade.status?.toLowerCase() === 'pending' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' :
+                                                trade.status?.toLowerCase() === 'accepted' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
+                                                    'bg-red-500/10 text-red-500 border-red-500/20'}`}>
                                             {trade.status}
                                         </span>
                                     )}
                                 </div>
 
-                                <div className="mb-3 py-1.5 px-2 bg-black/20 rounded border border-glass-surface/10">
+                                <div className="mb-3 py-1.5 px-2 bg-black/20 rounded">
                                     <div className="space-y-3">
                                         {/* Items coming TO the current user (once accepted/completed) */}
                                         <div>
                                             <div className="text-[0.5rem] text-primary uppercase font-bold mb-1 flex items-center gap-1">
                                                 <span className="w-1 h-1 rounded-full bg-primary" />
-                                                Receiving
+                                                {t('trade.list.receiving')}
                                             </div>
                                             <div className="space-y-1 pl-2">
                                                 {(() => {
@@ -124,7 +129,7 @@ export const TradesList: React.FC = () => {
                                                     });
 
                                                     if (!items || items.length === 0) {
-                                                        return <div className="text-[0.6rem] text-text-muted italic py-1 border border-dashed border-white/5 rounded-sm px-2">No items requested</div>;
+                                                        return <div className="text-[0.6rem] text-text-muted italic py-1 border border-dashed border-white/5 rounded-sm px-2">{t('trade.list.no_request')}</div>;
                                                     }
 
                                                     return items.map((r: any, idx: number) => (
@@ -141,7 +146,7 @@ export const TradesList: React.FC = () => {
                                         <div>
                                             <div className="text-[0.5rem] text-secondary uppercase font-bold mb-1 flex items-center gap-1">
                                                 <span className="w-1 h-1 rounded-full bg-secondary" />
-                                                Offering
+                                                {t('trade.list.offering')}
                                             </div>
                                             <div className="space-y-1 pl-2">
                                                 {(() => {
@@ -153,7 +158,7 @@ export const TradesList: React.FC = () => {
                                                     });
 
                                                     if (!items || items.length === 0) {
-                                                        return <div className="text-[0.6rem] text-text-muted italic py-1 border border-dashed border-white/5 rounded-sm px-2">No items offered in exchange</div>;
+                                                        return <div className="text-[0.6rem] text-text-muted italic py-1 border border-dashed border-white/5 rounded-sm px-2">{t('trade.list.no_offer')}</div>;
                                                     }
 
                                                     return items.map((r: any, idx: number) => (
@@ -169,7 +174,7 @@ export const TradesList: React.FC = () => {
                                 </div>
 
                                 {trade.status === 'PENDING' && (
-                                    <div className="flex gap-2">
+                                    <div className="flex gap-2 pb-4">
                                         {isInitiator ? (
                                             <Button
                                                 variant="outline"
@@ -177,7 +182,7 @@ export const TradesList: React.FC = () => {
                                                 onClick={() => handleCancel(trade.id)}
                                                 isLoading={cancelTrade.isPending}
                                             >
-                                                Cancel
+                                                {t('trade.list.cancel')}
                                             </Button>
                                         ) : (
                                             <>
@@ -187,14 +192,14 @@ export const TradesList: React.FC = () => {
                                                     onClick={() => handleReject(trade.id)}
                                                     isLoading={rejectTrade.isPending}
                                                 >
-                                                    Decline
+                                                    {t('trade.list.decline')}
                                                 </Button>
                                                 <Button
                                                     className="flex-1 py-1.5 text-[0.6rem]"
                                                     onClick={() => handleAccept(trade.id)}
                                                     isLoading={acceptTrade.isPending}
                                                 >
-                                                    Accept
+                                                    {t('trade.list.accept')}
                                                 </Button>
                                             </>
                                         )}

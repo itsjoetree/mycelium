@@ -1,0 +1,270 @@
+{
+    "common": {
+        "loading": "Cargando...",
+        "cancel": "Cancelar",
+        "confirm": "Confirmar",
+        "delete": "Eliminar",
+        "save": "Guardar",
+        "back": "Atrás",
+        "success": "Éxito",
+        "error": "Error",
+        "connecting": "Conectando a Mycelium...",
+        "init": "Inicializando Enlace Neural..."
+    },
+    "auth": {
+        "title": {
+            "register": "Unirse a la Red",
+            "login": "Acceder Nodo"
+        },
+        "fields": {
+            "username": "Usuario",
+            "username_placeholder": "Elige un apodo",
+            "email": "Email",
+            "email_placeholder": "Introduce tu señal",
+            "password": "Contraseña",
+            "password_placeholder": "*************"
+        },
+        "submit": {
+            "register": "Inicializar",
+            "login": "Conectar"
+        },
+        "toggle": {
+            "to_login": "¿Ya eres un nodo? Entrar",
+            "to_register": "¿Nueva estructura? Registrar"
+        },
+        "messages": {
+            "register_success": "Registro exitoso! Por favor inicia sesión.",
+            "login_success": "Conectado exitosamente",
+            "failed": "Autenticación fallida"
+        },
+        "subtitle": "Intercambio Urbano Descentralizado"
+    },
+    "nav": {
+        "dashboard": "Panel",
+        "marketplace": "Mercado",
+        "map": "Mapa",
+        "social": "Social",
+        "settings": "Ajustes",
+        "logout": "Cerrar Sesión",
+        "network": "Red",
+        "inventory": "Inventario"
+    },
+    "dashboard": {
+        "title": {
+            "marketplace": "CENTRO DE CONTROL",
+            "inventory": "INVENTARIO"
+        },
+        "subtitle": {
+            "marketplace": "Explorar Señales Globales",
+            "inventory": "Gestionando Activos Personales"
+        },
+        "header": {
+            "register": "Registrar Nuevo Activo"
+        },
+        "search_placeholder": "Buscar recursos...",
+        "filters": {
+            "all": "Todos",
+            "seed": "Semilla",
+            "compost": "Compost",
+            "harvest": "Cosecha",
+            "labor": "Trabajo"
+        },
+        "view": {
+            "grid": "Vista Cuadrícula",
+            "map": "Vista Mapa"
+        },
+        "loading": {
+            "scanning": "Escaneando Canales Neurales...",
+            "linking": "ENLAZANDO PERÍMETRO NEURAL..."
+        },
+        "sidebar": {
+            "updates": "Actualizaciones de Red"
+        },
+        "bundle": {
+            "staged": "Protocolo Preparado",
+            "target": "Objetivo",
+            "abort": "Abortar",
+            "initialize": "Iniciar Intercambio",
+            "ready": "Listo para Trueque",
+            "select_hint": "Seleccione recursos para preparar protocolo"
+        },
+        "empty": {
+            "no_signals": "Sin señales detectadas",
+            "sector_silent": "Sector silencioso"
+        },
+        "card": {
+            "node": "Nodo",
+            "modify": "Modificar",
+            "staged": "Listo para Intercambio",
+            "add": "Añadir a Propuesta"
+        }
+    },
+    "social": {
+        "sidebar": {
+            "title": "Señales de Red",
+            "search_placeholder": "Escanear IDs de Nodo...",
+            "discovery_title": "Salida de Descubrimiento",
+            "incoming_title": "Enlaces Entrantes",
+            "active_nodes": "Nodos Sincronizados",
+            "connect": "Enlazar",
+            "pulsing": "Pulsando...",
+            "sync": "Sincronizar",
+            "reject": "Rechazar",
+            "active_link": "ENLACE_ACTIVO"
+        },
+        "chat": {
+            "select_node": "Selecciona un nodo para enlace neural",
+            "select_node_title": "Seleccionar Frecuencia",
+            "select_node_desc": "La comunicación entre nodos requiere coincidencia de frecuencia activa. Selecciona un nodo sincronizado del perímetro para comenzar.",
+            "encrypted": "ENLACE_ENCRIPTADO",
+            "decrypting": "Desencriptando Interacciones...",
+            "input_placeholder": "Transmisión segura...",
+            "send": "Transmitir",
+            "stage_swap": "Preparar Intercambio",
+            "inspect": "Inspeccionar Señal",
+            "disconnect_title": "¿Desconectar Nodo?",
+            "disconnect_message": "Esto cortará permanentemente el enlace neural. Ningún protocolo de transmisión será posible hasta re-sincronizar.",
+            "confirm_disconnect": "Cortar Enlace"
+        },
+        "empty": {
+            "no_nodes": "No se detectaron nodos compatibles",
+            "isolated": "Aislado. Escanea nodos.",
+            "channel_ready": "Canal establecido. Esperando señales."
+        },
+        "toasts": {
+            "request_sent": "Solicitud de conexión difundida",
+            "request_fail": "Difusión fallida",
+            "synced": "Frecuencia coincidente. Nodo sincronizado.",
+            "sync_fail": "Sincronización fallida",
+            "rejected": "Señal rechazada",
+            "reject_fail": "Rechazo fallido",
+            "fetch_fail": "Fallo al interceptar recursos del nodo",
+            "disconnected": "Nodo desconectado",
+            "disconnect_fail": "Fallo en protocolo de desconexión",
+            "transmit_fail": "Fallo en transmisión de mensaje"
+        },
+        "interaction": {
+            "message": "Protocolo de Mensaje",
+            "barter": "Protocolo de Trueque"
+        }
+    },
+    "trade": {
+        "modal": {
+            "title": "Iniciar Protocolo de Trueque",
+            "subtitle": "Sincronizando con Nodo",
+            "search_friend": "Escanear inventario...",
+            "search_own": "Escanear tu inventario...",
+            "inventory_node": "Inventario Objetivo",
+            "inventory_own": "Tus Ofrecimientos",
+            "selected": "SELECCIONADO",
+            "empty_node": "No se encontraron activos",
+            "empty_own": "No hay activos disponibles",
+            "summary_title": "Resumen del Protocolo",
+            "assets_requested": "Activos Solicitados",
+            "assets_offered": "Activos Ofrecidos",
+            "abort": "Abortar",
+            "submit": "Confirmar Propuesta",
+            "select_all": "Seleccionar Todo",
+            "request": "Solicitar",
+            "offer": "Ofrecer"
+        },
+        "detail": {
+            "title": "Inspección de Protocolo",
+            "status_prefix": "Señal #{{id}} Estado: {{status}}",
+            "fetching": "Obteniendo Datos de Señal...",
+            "initiator": "Iniciador",
+            "target": "Nodo Objetivo",
+            "offered_assets": "Activos Ofrecidos",
+            "requested_assets": "Activos Solicitados",
+            "close": "Cerrar",
+            "abort": "Abortar Señal",
+            "decline": "Declinar",
+            "finalize": "Finalizar Protocolo"
+        },
+        "list": {
+            "loading": "Cargando actividad...",
+            "proposals": "Propuestas",
+            "log": "Registro",
+            "outgoing": "Saliente",
+            "incoming": "Entrante",
+            "receiving": "Recibiendo",
+            "offering": "Ofreciendo",
+            "empty_active": "Sin propuestas activas",
+            "empty_log": "Sin registros históricos",
+            "no_request": "Ningún ítem solicitado",
+            "no_offer": "Ningún ítem ofrecido",
+            "cancel": "Cancelar",
+            "decline": "Declinar",
+            "accept": "Aceptar"
+        },
+        "toasts": {
+            "select_resource": "Selecciona al menos un recurso para solicitar",
+            "broadcasted": "Propuesta de intercambio difundida en la red",
+            "failed": "Transmisión fallida",
+            "accepted": "Intercambio aceptado",
+            "accept_fail": "Fallo al aceptar intercambio",
+            "cancelled": "Propuesta cancelada",
+            "cancel_fail": "Fallo al cancelar",
+            "declined": "Propuesta declinada",
+            "decline_fail": "Fallo al rechazar"
+        }
+    },
+    "resource": {
+        "modal": {
+            "create_title": "Publicar Nueva Señal",
+            "edit_title": "Editar Señal",
+            "title_label": "Título",
+            "title_placeholder": "¿Qué ofreces?",
+            "quantity_label": "Cantidad",
+            "unit_label": "Unidad",
+            "unit_placeholder": "kg, litros, horas...",
+            "type_label": "Tipo",
+            "geo_label": "Coordenadas Geoespaciales",
+            "use_location": "Usar Mi Ubicación",
+            "latitude": "Latitud",
+            "longitude": "Longitud",
+            "cancel": "Cancelar",
+            "save": "Guardar Cambios",
+            "publish": "Publicar Señal"
+        },
+        "toasts": {
+            "loc_updated": "Ubicación actualizada",
+            "loc_fail": "No se pudo obtener ubicación. Introduce manualmente.",
+            "updated": "Recurso actualizado",
+            "created": "Recurso creado",
+            "failed": "Operación fallida"
+        }
+    },
+    "notifications": {
+        "title": "Notificaciones",
+        "mark_all": "Marcar todo como leido",
+        "empty": "Sin notificaciones",
+        "time": {
+            "just_now": "ahora mismo",
+            "minutes_ago": "hace {{count}}m",
+            "hours_ago": "hace {{count}}h",
+            "days_ago": "hace {{count}}d"
+        }
+    },
+    "settings": {
+        "title": "Configuración del Nodo",
+        "profile": "Identidad y Parámetros",
+        "profile_uplink": "Enlace de Perfil",
+        "bio_label": "Nota de Transmisión Neural (Bio)",
+        "bio_placeholder": "Introducir datos de señal...",
+        "theme": "Frecuencia de Acento Visual",
+        "language_protocol": "Protocolo de Lenguaje",
+        "save_changes": "Sincronizar Nodo",
+        "identity": {
+            "title": "Parámetros de Identidad Estática",
+            "system_id": "ID del Sistema",
+            "email": "Email de Registro",
+            "status": "Estado del Nodo: En Línea"
+        },
+        "danger": {
+            "title": "Protocolo Terminal",
+            "text": "El desmantelamiento completo del nodo requiere autoridad central de malla. Contacta al Comando de Malla.",
+            "button": "Solicitar Borrado"
+        }
+    }
+}
