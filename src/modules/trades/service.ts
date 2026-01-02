@@ -25,6 +25,8 @@ export class TradeService {
                 resourceTitle: resources.title,
                 resourceQuantity: resources.quantity,
                 resourceUnit: resources.unit,
+                resourceOwnerId: resources.ownerId,
+                resourceType: resources.type,
             })
             .from(trades)
             .leftJoin(initiators, eq(trades.initiatorId, initiators.id))
@@ -53,12 +55,14 @@ export class TradeService {
                     title: row.resourceTitle,
                     quantity: row.resourceQuantity,
                     unit: row.resourceUnit,
+                    ownerId: row.resourceOwnerId,
+                    type: row.resourceType,
                 });
             }
         }
 
         return Array.from(tradesMap.values()).map(t => {
-            const { resourceTitle, resourceQuantity, resourceUnit, ...rest } = t;
+            const { resourceTitle, resourceQuantity, resourceUnit, resourceOwnerId, resourceType, ...rest } = t;
             return rest;
         });
     }
@@ -179,16 +183,34 @@ export class TradeService {
                 throw new HTTPException(409, { message: 'Some resources are no longer available' });
             }
 
-            // 4. Update Resource Status and Ownership
-            // Transfer ownership to the initiator (the person who requested the trade)
-            await tx
-                .update(resources)
-                .set({
-                    ownerId: trade.initiatorId,
-                    status: 'available', // Keep it available but it now belongs to the new owner
-                    updatedAt: new Date()
-                })
-                .where(inArray(resources.id, resourceIds));
+            // 4. Update Resource Status and Ownership (Bidirectional Swap)
+            // Separate resources by original owner to prevent subsequent updates from overwriting
+            const receiverResources = currentResources.filter(r => r.ownerId === trade.receiverId).map(r => r.id);
+            const initiatorResources = currentResources.filter(r => r.ownerId === trade.initiatorId).map(r => r.id);
+
+            // Transfer items to Initiator
+            if (receiverResources.length > 0) {
+                await tx
+                    .update(resources)
+                    .set({
+                        ownerId: trade.initiatorId,
+                        status: 'available',
+                        updatedAt: new Date()
+                    })
+                    .where(inArray(resources.id, receiverResources));
+            }
+
+            // Transfer items to Receiver
+            if (initiatorResources.length > 0) {
+                await tx
+                    .update(resources)
+                    .set({
+                        ownerId: trade.receiverId,
+                        status: 'available',
+                        updatedAt: new Date()
+                    })
+                    .where(inArray(resources.id, initiatorResources));
+            }
 
             // 5. Update Trade Status
             const [updatedTrade] = await tx

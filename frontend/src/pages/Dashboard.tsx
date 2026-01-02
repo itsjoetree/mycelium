@@ -30,18 +30,41 @@ export const Dashboard: React.FC = () => {
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [resourceToDelete, setResourceToDelete] = useState<number | null>(null);
 
+    // Bundle State
+    const [tradeBundle, setTradeBundle] = useState<any[]>([]);
+
     const deleteResource = useDeleteResource();
 
     // Filter State
     const [view, setView] = useState<'marketplace' | 'inventory'>('marketplace');
     const [displayMode, setDisplayMode] = useState<'grid' | 'map'>('grid');
 
-    const openTrade = (res: any) => {
+    const toggleBundleItem = (res: any) => {
         if (res.ownerId === session?.id) {
             toast.error("You already own this resource");
             return;
         }
-        setSelectedResource(res);
+
+        setTradeBundle(prev => {
+            const exists = prev.find(item => item.id === res.id);
+            if (exists) {
+                return prev.filter(item => item.id !== res.id);
+            }
+
+            // Check owner consistency
+            if (prev.length > 0 && prev[0].ownerId !== res.ownerId) {
+                toast.error(`You can only bundle items from @${prev[0].ownerUsername || prev[0].ownerId} in this trade`);
+                return prev;
+            }
+
+            return [...prev, res];
+        });
+    };
+
+    const clearBundle = () => setTradeBundle([]);
+
+    const openTrade = () => {
+        if (tradeBundle.length === 0) return;
         setTradeModalOpen(true);
     };
 
@@ -142,6 +165,43 @@ export const Dashboard: React.FC = () => {
                             )}
                         </div>
 
+                        <div className={`mb-6 p-4 rounded-lg border transition-all duration-300 flex justify-between items-center min-h-[72px]
+                            ${tradeBundle.length > 0
+                                ? 'bg-primary/5 border-primary/20 animate-in fade-in slide-in-from-top-4 shadow-[0_0_20px_rgba(0,255,157,0.05)]'
+                                : 'bg-black/20 border-white/5 opacity-40'}`}>
+                            {tradeBundle.length > 0 ? (
+                                <>
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex -space-x-2">
+                                            {tradeBundle.map(item => (
+                                                <div key={item.id} className="w-8 h-8 rounded-full bg-black border border-primary flex items-center justify-center text-[0.6rem] font-bold text-primary shadow-lg ring-2 ring-black">
+                                                    {item.title[0].toUpperCase()}
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <div>
+                                            <h4 className="text-sm font-bold text-primary">Trade Bundle ({tradeBundle.length} items)</h4>
+                                            <p className="text-[0.6rem] text-text-muted uppercase font-mono">Requesting from @{tradeBundle[0].ownerUsername || tradeBundle[0].ownerId}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <Button variant="ghost" className="text-[0.6rem] h-8" onClick={clearBundle}>Clear</Button>
+                                        <Button className="text-[0.6rem] h-8 px-6" onClick={openTrade}>Configure Proposal</Button>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="flex items-center gap-4">
+                                    <div className="w-8 h-8 rounded-full border border-dashed border-text-muted/20 flex items-center justify-center">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-text-muted/10" />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-[0.6rem] font-bold text-text-muted uppercase tracking-[0.2em]">Ready For Barter</h4>
+                                        <p className="text-[0.55rem] text-text-muted italic font-mono">Select resources to begin assembling a trade proposal</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
                         {displayMode === 'grid' ? (
                             <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4">
                                 {resourcesLoading ? (
@@ -189,12 +249,12 @@ export const Dashboard: React.FC = () => {
                                                 </>
                                             ) : (
                                                 <Button
-                                                    variant="secondary"
+                                                    variant={tradeBundle.find(item => item.id === res.id) ? "primary" : "secondary"}
                                                     className="w-full text-xs"
-                                                    onClick={() => openTrade(res)}
+                                                    onClick={() => toggleBundleItem(res)}
                                                     disabled={res.status !== 'available'}
                                                 >
-                                                    Initiate Trade
+                                                    {tradeBundle.find(item => item.id === res.id) ? "Item Added" : "Add to Bundle"}
                                                 </Button>
                                             )}
                                         </div>
@@ -206,7 +266,8 @@ export const Dashboard: React.FC = () => {
                                 key={view}
                                 resources={displayResources}
                                 currentUserId={session?.id}
-                                onInitiateTrade={openTrade}
+                                onInitiateTrade={toggleBundleItem}
+                                selectedIds={tradeBundle.map(i => i.id)}
                             />
                         )}
                     </div>
@@ -222,17 +283,17 @@ export const Dashboard: React.FC = () => {
                     </aside>
                 </div>
 
-                {selectedResource && tradeModalOpen && (
+                {tradeBundle.length > 0 && tradeModalOpen && (
                     <TradeModal
                         isOpen={tradeModalOpen}
                         onClose={() => {
                             setTradeModalOpen(false);
-                            setSelectedResource(null);
                         }}
-                        receiverId={selectedResource.ownerId}
-                        receiverUsername={selectedResource.ownerUsername}
-                        resourceId={selectedResource.id}
-                        resourceTitle={selectedResource.title}
+                        receiverId={tradeBundle[0].ownerId}
+                        receiverUsername={tradeBundle[0].ownerUsername}
+                        resources={tradeBundle}
+                        myResources={inventoryResources.filter((r: any) => r.status === 'available')}
+                        onSuccess={clearBundle}
                     />
                 )}
 

@@ -107,14 +107,64 @@ export const TradesList: React.FC = () => {
                                 </div>
 
                                 <div className="mb-3 py-1.5 px-2 bg-black/20 rounded border border-glass-surface/10">
-                                    <div className="text-[0.5rem] text-text-muted uppercase mb-1">Resources</div>
-                                    <div className="space-y-1">
-                                        {trade.resources?.map((r: any, idx: number) => (
-                                            <div key={idx} className="text-[0.7rem] text-text font-medium flex justify-between">
-                                                <span className="truncate">{r.title}</span>
-                                                <span className="text-primary ml-2 flex-shrink-0">{r.quantity} {r.unit}</span>
+                                    <div className="space-y-3">
+                                        {/* Items coming TO the current user (once accepted/completed) */}
+                                        <div>
+                                            <div className="text-[0.5rem] text-primary uppercase font-bold mb-1 flex items-center gap-1">
+                                                <span className="w-1 h-1 rounded-full bg-primary" />
+                                                Receiving
                                             </div>
-                                        )) || <div className="text-[0.7rem] text-text-muted">N/A</div>}
+                                            <div className="space-y-1 pl-2">
+                                                {(() => {
+                                                    // Logic: If Pending, items NOT owned by me are receiving.
+                                                    // If Accepted, items NOW owned by me were the ones received.
+                                                    const items = trade.resources?.filter((r: any) => {
+                                                        if (trade.status === 'PENDING') return r.ownerId !== session?.id;
+                                                        return r.ownerId === session?.id;
+                                                    });
+
+                                                    if (!items || items.length === 0) {
+                                                        return <div className="text-[0.6rem] text-text-muted italic py-1 border border-dashed border-white/5 rounded-sm px-2">No items requested</div>;
+                                                    }
+
+                                                    return items.map((r: any, idx: number) => (
+                                                        <div key={idx} className="text-[0.7rem] text-text font-medium flex justify-between">
+                                                            <span className="truncate">{r.title}</span>
+                                                            <span className="text-primary ml-2 flex-shrink-0">{r.quantity} {r.unit}</span>
+                                                        </div>
+                                                    ));
+                                                })()}
+                                            </div>
+                                        </div>
+
+                                        {/* Items going FROM the current user */}
+                                        <div>
+                                            <div className="text-[0.5rem] text-secondary uppercase font-bold mb-1 flex items-center gap-1">
+                                                <span className="w-1 h-1 rounded-full bg-secondary" />
+                                                Offering
+                                            </div>
+                                            <div className="space-y-1 pl-2">
+                                                {(() => {
+                                                    // Logic: If Pending, items owned by me are offering.
+                                                    // If Accepted, items NO LONGER owned by me were the ones offered.
+                                                    const items = trade.resources?.filter((r: any) => {
+                                                        if (trade.status === 'PENDING') return r.ownerId === session?.id;
+                                                        return r.ownerId !== session?.id;
+                                                    });
+
+                                                    if (!items || items.length === 0) {
+                                                        return <div className="text-[0.6rem] text-text-muted italic py-1 border border-dashed border-white/5 rounded-sm px-2">No items offered in exchange</div>;
+                                                    }
+
+                                                    return items.map((r: any, idx: number) => (
+                                                        <div key={idx} className="text-[0.7rem] text-text font-medium flex justify-between">
+                                                            <span className="truncate">{r.title}</span>
+                                                            <span className="text-secondary ml-2 flex-shrink-0">{r.quantity} {r.unit}</span>
+                                                        </div>
+                                                    ));
+                                                })()}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 

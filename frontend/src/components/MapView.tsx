@@ -16,6 +16,7 @@ interface MapViewProps {
     resources: any[];
     onInitiateTrade: (resource: any) => void;
     currentUserId?: number;
+    selectedIds?: number[];
 }
 
 // Component to handle auto-fitting the map to markers
@@ -51,7 +52,7 @@ const MapAutoCenter: React.FC<{ markers: any[] }> = ({ markers }) => {
     return null;
 };
 
-export const MapView: React.FC<MapViewProps> = ({ resources, onInitiateTrade, currentUserId }) => {
+export const MapView: React.FC<MapViewProps> = ({ resources, onInitiateTrade, currentUserId, selectedIds = [] }) => {
     // Filter resources that have valid coordinates (including 0,0)
     const geoResources = resources.filter(r =>
         (r.latitude !== null && r.latitude !== undefined) &&
@@ -105,11 +106,14 @@ export const MapView: React.FC<MapViewProps> = ({ resources, onInitiateTrade, cu
 
                                 <Button
                                     size="sm"
+                                    variant={selectedIds.includes(res.id) ? "primary" : "secondary"}
                                     className="w-full text-[0.6rem] py-1 h-auto"
                                     onClick={() => onInitiateTrade(res)}
                                     disabled={res.ownerId === currentUserId || res.status !== 'available'}
                                 >
-                                    {res.ownerId === currentUserId ? 'My Resource' : 'Propose Trade'}
+                                    {res.ownerId === currentUserId
+                                        ? 'My Resource'
+                                        : selectedIds.includes(res.id) ? 'Item Added' : 'Add to Bundle'}
                                 </Button>
                             </div>
                         </Popup>
