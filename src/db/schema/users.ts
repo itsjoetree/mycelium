@@ -6,6 +6,8 @@ export const users = pgTable('users', {
     passwordHash: text('password_hash').notNull(),
     username: text('username').notNull().unique(),
     isVerified: boolean('is_verified').default(false),
+    bio: text('bio'),
+    themeColor: text('theme_color').default('#00ff9d'),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
 });
