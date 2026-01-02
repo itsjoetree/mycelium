@@ -1,11 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { client } from '../lib/api';
 
-export function useResources() {
+export function useResources(filters?: { type?: any; search?: string; ownerId?: string }) {
     return useQuery({
-        queryKey: ['resources'],
+        queryKey: ['resources', filters],
         queryFn: async () => {
-            const { data, error } = await client.GET('/resources');
+            const { data, error } = await client.GET('/resources', {
+                params: {
+                    // @ts-ignore
+                    query: filters
+                }
+            });
             if (error) throw error;
             return data;
         },

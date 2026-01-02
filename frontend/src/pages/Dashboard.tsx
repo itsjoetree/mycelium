@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useResources } from '../hooks/useResources';
 import { useUserSession } from '../hooks/useAuth';
 import { Card } from '../components/ui/Card';
@@ -18,7 +18,23 @@ import { useDeleteResource } from '../hooks/useResources';
 export const Dashboard: React.FC = () => {
     useWebSocket();
     const { data: session, isLoading: sessionLoading } = useUserSession();
-    const { data: resources, isLoading: resourcesLoading } = useResources();
+    const [view, setView] = useState<'marketplace' | 'inventory'>('marketplace');
+    const [displayMode, setDisplayMode] = useState<'grid' | 'map'>('grid');
+
+    // Filter State
+    const [search, setSearch] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
+    const [typeFilter, setTypeFilter] = useState<string | null>(null);
+
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedSearch(search), 300);
+        return () => clearTimeout(timer);
+    }, [search]);
+
+    const { data: resources, isLoading: resourcesLoading } = useResources({
+        search: debouncedSearch || undefined,
+        type: typeFilter || undefined
+    });
 
     // Resource Modal State
     const [resourceModalOpen, setResourceModalOpen] = useState(false);
@@ -35,9 +51,6 @@ export const Dashboard: React.FC = () => {
 
     const deleteResource = useDeleteResource();
 
-    // Filter State
-    const [view, setView] = useState<'marketplace' | 'inventory'>('marketplace');
-    const [displayMode, setDisplayMode] = useState<'grid' | 'map'>('grid');
 
     const toggleBundleItem = (res: any) => {
         if (res.ownerId === session?.id) {
@@ -138,6 +151,56 @@ export const Dashboard: React.FC = () => {
                             <Button onClick={() => setResourceModalOpen(true)}>
                                 Add Resource
                             </Button>
+                        </div>
+
+                        {/* Search & Filtering */}
+                        <div className="flex flex-col md:flex-row gap-4 mb-8">
+                            <div className="relative flex-1 group">
+                                <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                                    <svg className="w-4 h-4 text-text-muted group-focus-within:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="Search resources..."
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    className="w-full bg-black/40 border border-glass-surface rounded-lg py-2 pl-10 pr-4 text-sm focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all font-mono"
+                                />
+                                {search && (
+                                    <button
+                                        onClick={() => setSearch('')}
+                                        className="absolute inset-y-0 right-3 flex items-center text-text-muted hover:text-text"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                )}
+                            </div>
+                            <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                                {['seed', 'compost', 'harvest', 'labor'].map((type) => (
+                                    <button
+                                        key={type}
+                                        onClick={() => setTypeFilter(typeFilter === type ? null : type)}
+                                        className={`px-3 py-2 rounded-lg text-[0.6rem] uppercase font-bold tracking-[0.1em] border transition-all whitespace-nowrap
+                                            ${typeFilter === type
+                                                ? 'bg-primary/20 border-primary text-primary shadow-[0_0_15px_rgba(0,255,157,0.15)]'
+                                                : 'bg-black/20 border-glass-surface text-text-muted hover:border-text-muted'}`}
+                                    >
+                                        {type}s
+                                    </button>
+                                ))}
+                                {typeFilter && (
+                                    <button
+                                        onClick={() => setTypeFilter(null)}
+                                        className="px-2 py-2 text-[0.6rem] uppercase font-bold text-red-400 hover:text-red-300 transition-colors"
+                                    >
+                                        Clear
+                                    </button>
+                                )}
+                            </div>
                         </div>
 
                         <div className="mb-6 flex items-center justify-between border-b border-glass-surface pb-4">

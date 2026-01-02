@@ -3,7 +3,7 @@ import { db } from '../../db';
 import { resources, users } from '../../db/schema';
 import { requireAuth } from '../auth/helper';
 import { TradeService } from '../trades/service';
-import { eq, desc, and, gte, lte } from 'drizzle-orm';
+import { eq, desc, and, gte, lte, or, ilike } from 'drizzle-orm';
 
 const resourceApp = new OpenAPIHono();
 
@@ -164,11 +164,21 @@ const resourceSchema = z.object({
     createdAt: z.string(),
 });
 
+const resourceQuerySchema = z.object({
+    type: z.enum(['seed', 'compost', 'harvest', 'labor']).optional(),
+    search: z.string().optional(),
+    ownerId: z.string().optional(),
+    minQuantity: z.string().optional(),
+});
+
 resourceApp.openapi(
     {
         method: 'get',
         path: '/',
         description: 'List resources',
+        request: {
+            query: resourceQuerySchema,
+        },
         responses: {
             200: {
                 description: 'List of resources',
@@ -181,7 +191,24 @@ resourceApp.openapi(
         },
     },
     async (c) => {
-        const list = await db
+        const { type, search, ownerId, minQuantity } = c.req.valid('query');
+
+        const filters = [];
+        if (type) filters.push(eq(resources.type, type));
+        if (ownerId) filters.push(eq(resources.ownerId, parseInt(ownerId)));
+        if (minQuantity) filters.push(gte(resources.quantity, parseFloat(minQuantity)));
+
+        if (search) {
+            const searchPattern = `%${search}%`;
+            filters.push(
+                or(
+                    ilike(resources.title, searchPattern),
+                    ilike(resources.description, searchPattern)
+                )
+            );
+        }
+
+        const query = db
             .select({
                 id: resources.id,
                 title: resources.title,
@@ -197,7 +224,11 @@ resourceApp.openapi(
                 ownerUsername: users.username,
             })
             .from(resources)
-            .leftJoin(users, eq(resources.ownerId, users.id));
+            .leftJoin(users, eq(resources.ownerId, users.id))
+            .where(filters.length > 0 ? and(...filters) : undefined)
+            .orderBy(desc(resources.createdAt));
+
+        const list = await query;
 
         return c.json(list as any, 200);
     },
