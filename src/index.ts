@@ -9,6 +9,7 @@ import tradeApp from './modules/trades';
 import notificationApp from './modules/notifications';
 import userApp from './modules/users';
 import socialApp from './modules/social';
+import messageApp from './modules/messages';
 
 import { rateLimiter } from './lib/rate-limit';
 
@@ -24,7 +25,8 @@ app.route('/resources', resourceApp);
 app.route('/trades', tradeApp);
 app.route('/notifications', notificationApp);
 app.route('/users', userApp);
-app.route('/social', socialApp);
+app.route('/social-api', socialApp);
+app.route('/messages', messageApp);
 
 app.get('/', (c) => {
     return c.json({

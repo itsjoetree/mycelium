@@ -1,6 +1,6 @@
 import { db } from '../../db';
 import { users } from '../../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, ilike, ne, and } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 
 export class UserService {
@@ -43,5 +43,22 @@ export class UserService {
         }
 
         return updated;
+    }
+
+    static async searchUsers(query: string, currentUserId: number) {
+        const cleanQuery = query.startsWith('@') ? query.slice(1) : query;
+        return await db.query.users.findMany({
+            where: and(
+                ilike(users.username, `%${cleanQuery}%`),
+                ne(users.id, currentUserId)
+            ),
+            limit: 10,
+            columns: {
+                id: true,
+                username: true,
+                bio: true,
+                themeColor: true,
+            },
+        });
     }
 }

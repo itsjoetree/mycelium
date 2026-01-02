@@ -1,7 +1,9 @@
 import { db } from '../../db';
-import { users, friendships } from '../../db/schema';
-import { eq, and, or, ne } from 'drizzle-orm';
+import { users, friendships, trades, tradeItems, resources, messages } from '../../db/schema';
+import { eq, and, or, desc, ilike, ne } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
+import { requireAuth } from '../auth/helper';
+import { alias } from 'drizzle-orm/pg-core';
 import { NotificationService } from '../notifications/service';
 import { WebSocketManager } from '../../lib/ws';
 
@@ -151,5 +153,89 @@ export class SocialService {
             );
 
         return pending;
+    }
+
+    static async listOutboundRequests(userId: number) {
+        const outbound = await db
+            .select({
+                id: users.id,
+                username: users.username,
+                bio: users.bio,
+                themeColor: users.themeColor,
+                requestId: friendships.id,
+                createdAt: friendships.createdAt,
+            })
+            .from(friendships)
+            .innerJoin(users, eq(friendships.friendId, users.id))
+            .where(
+                and(
+                    eq(friendships.userId, userId),
+                    eq(friendships.status, 'PENDING')
+                )
+            );
+
+        return outbound;
+    }
+
+    static async removeFriend(userId: number, friendId: number) {
+        const [deleted] = await db
+            .delete(friendships)
+            .where(
+                and(
+                    eq(friendships.status, 'ACCEPTED'),
+                    or(
+                        and(eq(friendships.userId, userId), eq(friendships.friendId, friendId)),
+                        and(eq(friendships.userId, friendId), eq(friendships.friendId, userId))
+                    )
+                )
+            )
+            .returning();
+
+        if (!deleted) {
+            throw new HTTPException(404, { message: 'Friendship not found' });
+        }
+
+        return deleted;
+    }
+
+    static async getInteractions(userId: number, friendId: number) {
+        // Fetch Messages
+        const msgList = await db
+            .select()
+            .from(messages)
+            .where(
+                or(
+                    and(eq(messages.senderId, userId), eq(messages.receiverId, friendId)),
+                    and(eq(messages.senderId, friendId), eq(messages.receiverId, userId))
+                )
+            );
+
+        // Fetch Trades
+        const tradeList = await db
+            .select({
+                id: trades.id,
+                initiatorId: trades.initiatorId,
+                receiverId: trades.receiverId,
+                status: trades.status,
+                createdAt: trades.createdAt,
+            })
+            .from(trades)
+            .where(
+                or(
+                    and(eq(trades.initiatorId, userId), eq(trades.receiverId, friendId)),
+                    and(eq(trades.initiatorId, friendId), eq(trades.receiverId, userId))
+                )
+            );
+
+        // Combine and format
+        const interactions = [
+            ...msgList.map(m => ({ ...m, interactionType: 'MESSAGE' as const })),
+            ...tradeList.map(t => ({ ...t, interactionType: 'TRADE' as const }))
+        ];
+
+        // Sort by timestamp
+        interactions.sort((a, b) => new Date(a.createdAt!).getTime() - new Date(b.createdAt!).getTime());
+
+        return interactions;
     }
 }

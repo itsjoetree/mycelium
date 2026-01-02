@@ -49,6 +49,14 @@ export const UserMenu: React.FC = () => {
                         </div>
 
                         <Link
+                            to="/social"
+                            className="block px-4 py-2 text-sm hover:bg-primary hover:text-bg-deep transition-colors duration-200"
+                            onClick={() => setIsOpen(false)}
+                        >
+                            Social Network
+                        </Link>
+
+                        <Link
                             to="/settings"
                             className="block px-4 py-2 text-sm hover:bg-primary hover:text-bg-deep transition-colors duration-200"
                             onClick={() => setIsOpen(false)}

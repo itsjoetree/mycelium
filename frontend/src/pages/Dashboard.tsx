@@ -360,6 +360,7 @@ export const Dashboard: React.FC = () => {
                         receiverUsername={tradeBundle[0].ownerUsername}
                         resources={tradeBundle}
                         myResources={inventoryResources.filter((r: any) => r.status === 'available')}
+                        defaultAll={true}
                         onSuccess={clearBundle}
                     />
                 )}

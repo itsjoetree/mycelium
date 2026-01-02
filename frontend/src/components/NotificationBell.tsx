@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNotifications, useReadNotification, useReadAllNotifications } from '../hooks/useNotifications';
 import { NotificationDetailModal } from './NotificationDetailModal';
+import { useNavigate } from 'react-router-dom';
 
 const formatTimeAgo = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -20,6 +21,7 @@ export const NotificationBell: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedTradeId, setSelectedTradeId] = useState<number | null>(null);
     const [detailModalOpen, setDetailModalOpen] = useState(false);
+    const navigate = useNavigate();
 
     const { data: notifications = [] } = useNotifications();
     const readNotification = useReadNotification();
@@ -36,6 +38,9 @@ export const NotificationBell: React.FC = () => {
             setSelectedTradeId(notification.tradeId);
             setDetailModalOpen(true);
             setIsOpen(false); // Close dropdown
+        } else if (notification.type.startsWith('FRIEND_')) {
+            navigate('/social');
+            setIsOpen(false);
         }
     };
 
@@ -89,8 +94,9 @@ export const NotificationBell: React.FC = () => {
                                         <div className="flex justify-between items-start gap-2 mb-1">
                                             <span className={`text-[0.6rem] px-1.5 py-0.5 rounded border border-current uppercase font-bold
                                                 ${n.type.startsWith('TRADE_PROPOSED') ? 'text-primary' :
-                                                    n.type === 'TRADE_ACCEPTED' ? 'text-secondary' : 'text-text-muted'}`}>
-                                                {n.type.replace('TRADE_', '')}
+                                                    n.type === 'TRADE_ACCEPTED' ? 'text-secondary' :
+                                                        n.type.startsWith('FRIEND_') ? 'text-cyan-400' : 'text-text-muted'}`}>
+                                                {n.type.replace('TRADE_', '').replace('FRIEND_', 'SOCIAL_')}
                                             </span>
                                             <span className="text-[0.6rem] text-text-muted font-mono">
                                                 {formatTimeAgo(n.createdAt)}

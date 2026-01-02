@@ -7,6 +7,7 @@ import './index.css';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { Settings } from './pages/Settings';
+import { Social } from './pages/Social';
 
 const queryClient = new QueryClient();
 
@@ -19,6 +20,7 @@ function App() {
                         <Route path="/login" element={<Login />} />
                         <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/settings" element={<Settings />} />
+                        <Route path="/social" element={<Social />} />
                         <Route path="*" element={<Navigate to="/login" replace />} />
                     </Routes>
                 </div>

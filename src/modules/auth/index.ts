@@ -58,8 +58,8 @@ authApp.openapi(
         const sessionId = await AuthService.createSession(user.id);
         setCookie(c, 'session_id', sessionId, {
             httpOnly: true,
-            secure: true, // Should be true in prod
-            sameSite: 'Strict',
+            secure: false, // Set to true in production with HTTPS
+            sameSite: 'Lax',
             path: '/',
             maxAge: 60 * 60 * 24 * 7,
         });
@@ -103,8 +103,8 @@ authApp.openapi(
         const sessionId = await AuthService.createSession(user.id);
         setCookie(c, 'session_id', sessionId, {
             httpOnly: true,
-            secure: true,
-            sameSite: 'Strict',
+            secure: false,
+            sameSite: 'Lax',
             path: '/',
             maxAge: 60 * 60 * 24 * 7,
         });
@@ -175,8 +175,8 @@ authApp.openapi(
 
         setCookie(c, 'session_id', '', {
             httpOnly: true,
-            secure: true,
-            sameSite: 'Strict',
+            secure: false,
+            sameSite: 'Lax',
             path: '/',
             maxAge: 0,
         });

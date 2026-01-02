@@ -126,6 +126,15 @@ socialApp.openapi(
     }
 );
 
+const requestSchema = z.object({
+    id: z.number(),
+    username: z.string(),
+    bio: z.string().nullable(),
+    themeColor: z.string().nullable(),
+    requestId: z.number(),
+    createdAt: z.any(),
+});
+
 socialApp.openapi(
     {
         method: 'get',
@@ -137,12 +146,88 @@ socialApp.openapi(
                 description: 'List of pending requests',
                 content: {
                     'application/json': {
+                        schema: z.array(requestSchema),
+                    },
+                },
+            },
+        },
+    },
+    async (c) => {
+        const userId = await requireAuth(c);
+        const pending = await SocialService.listPendingRequests(userId);
+        return c.json(pending, 200);
+    },
+);
+
+socialApp.openapi(
+    {
+        method: 'get',
+        path: '/outbound-requests',
+        description: 'List outbound friend requests',
+        security: [{ cookieAuth: [] }],
+        responses: {
+            200: {
+                description: 'List of outbound requests',
+                content: {
+                    'application/json': {
+                        schema: z.array(requestSchema),
+                    },
+                },
+            },
+        },
+    },
+    async (c) => {
+        const userId = await requireAuth(c);
+        const outbound = await SocialService.listOutboundRequests(userId);
+        return c.json(outbound, 200);
+    },
+);
+
+socialApp.openapi(
+    {
+        method: 'delete',
+        path: '/friends/{id}',
+        description: 'Remove a friend',
+        security: [{ cookieAuth: [] }],
+        request: {
+            params: z.object({ id: z.string() }),
+        },
+        responses: {
+            200: { description: 'Friend removed' },
+            404: { description: 'Friendship not found' },
+        },
+    },
+    async (c) => {
+        const userId = await requireAuth(c);
+        const friendId = parseInt(c.req.param('id')!);
+        await SocialService.removeFriend(userId, friendId);
+        return c.json({ message: 'Friend removed' }, 200);
+    },
+);
+
+socialApp.openapi(
+    {
+        method: 'get',
+        path: '/friends/{id}/interactions',
+        description: 'Get unified interactions with a friend',
+        security: [{ cookieAuth: [] }],
+        request: {
+            params: z.object({ id: z.string() }),
+        },
+        responses: {
+            200: {
+                description: 'Timeline of messages and trades',
+                content: {
+                    'application/json': {
                         schema: z.array(z.object({
                             id: z.number(),
-                            username: z.string(),
-                            bio: z.string().nullable(),
-                            themeColor: z.string().nullable(),
-                            requestId: z.number(),
+                            interactionType: z.enum(['MESSAGE', 'TRADE']),
+                            senderId: z.number().optional().nullable(), // for messages
+                            receiverId: z.number(),
+                            initiatorId: z.number().optional().nullable(), // for trades
+                            content: z.string().optional().nullable(), // for messages
+                            status: z.string().optional().nullable(), // for trades
+                            isRead: z.boolean().optional().nullable(),
                             createdAt: z.any(),
                         })),
                     },
@@ -152,9 +237,10 @@ socialApp.openapi(
     },
     async (c) => {
         const userId = await requireAuth(c);
-        const requests = await SocialService.listPendingRequests(userId);
-        return c.json(requests, 200);
-    }
+        const friendId = parseInt(c.req.param('id')!);
+        const interactions = await SocialService.getInteractions(userId, friendId);
+        return c.json(interactions, 200);
+    },
 );
 
 export default socialApp;

@@ -10,6 +10,9 @@ export default defineConfig({
             '/resources': 'http://localhost:3000',
             '/trades': 'http://localhost:3000',
             '/notifications': 'http://localhost:3000',
+            '/users': 'http://localhost:3000',
+            '/social-api': 'http://localhost:3000',
+            '/messages': 'http://localhost:3000',
             '/ws': {
                 target: 'ws://localhost:3000',
                 ws: true

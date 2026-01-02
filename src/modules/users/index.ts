@@ -81,6 +81,41 @@ userApp.openapi(
 userApp.openapi(
     {
         method: 'get',
+        path: '/search',
+        description: 'Search for users',
+        security: [{ cookieAuth: [] }],
+        request: {
+            query: z.object({
+                search: z.string().optional(),
+            }),
+        },
+        responses: {
+            200: {
+                description: 'User list',
+                content: {
+                    'application/json': {
+                        schema: z.array(z.object({
+                            id: z.number(),
+                            username: z.string(),
+                            bio: z.string().nullable(),
+                            themeColor: z.string().nullable(),
+                        })),
+                    },
+                },
+            },
+        },
+    },
+    async (c) => {
+        const userId = await requireAuth(c);
+        const { search } = c.req.valid('query');
+        const users = await UserService.searchUsers(search || '', userId);
+        return c.json(users, 200);
+    }
+);
+
+userApp.openapi(
+    {
+        method: 'get',
         path: '/{id}',
         description: 'Get user profile by ID',
         request: {

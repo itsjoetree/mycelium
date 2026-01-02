@@ -413,6 +413,346 @@ export interface paths {
       };
     };
   };
+  "/users/me": {
+    /** @description Get current user profile */
+    get: {
+      responses: {
+        /** @description User profile */
+        200: {
+          content: {
+            "application/json": {
+              id: number;
+              username: string;
+              bio: string | null;
+              themeColor: string | null;
+              createdAt?: unknown;
+            };
+          };
+        };
+      };
+    };
+    /** @description Update current user profile */
+    patch: {
+      requestBody?: {
+        content: {
+          "application/json": {
+            bio?: string;
+            themeColor?: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Profile updated */
+        200: {
+          content: {
+            "application/json": {
+              id: number;
+              username: string;
+              bio: string | null;
+              themeColor: string | null;
+            };
+          };
+        };
+      };
+    };
+  };
+  "/users/search": {
+    /** @description Search for users */
+    get: {
+      parameters: {
+        query?: {
+          search?: string;
+        };
+      };
+      responses: {
+        /** @description User list */
+        200: {
+          content: {
+            "application/json": ({
+                id: number;
+                username: string;
+                bio: string | null;
+                themeColor: string | null;
+              })[];
+          };
+        };
+      };
+    };
+  };
+  "/users/{id}": {
+    /** @description Get user profile by ID */
+    get: {
+      parameters: {
+        path: {
+          id: string;
+        };
+      };
+      responses: {
+        /** @description User profile */
+        200: {
+          content: {
+            "application/json": {
+              id: number;
+              username: string;
+              bio: string | null;
+              themeColor: string | null;
+              createdAt?: unknown;
+            };
+          };
+        };
+        /** @description User not found */
+        404: {
+          content: never;
+        };
+      };
+    };
+  };
+  "/social-api/request": {
+    /** @description Send a friend request */
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": {
+            friendId: number;
+          };
+        };
+      };
+      responses: {
+        /** @description Friend request sent */
+        201: {
+          content: never;
+        };
+        /** @description Invalid request */
+        400: {
+          content: never;
+        };
+        /** @description User not found */
+        404: {
+          content: never;
+        };
+      };
+    };
+  };
+  "/social-api/accept": {
+    /** @description Accept a friend request */
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": {
+            requesterId: number;
+          };
+        };
+      };
+      responses: {
+        /** @description Friend request accepted */
+        200: {
+          content: never;
+        };
+        /** @description Request not found */
+        404: {
+          content: never;
+        };
+      };
+    };
+  };
+  "/social-api/reject": {
+    /** @description Reject a friend request */
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": {
+            requesterId: number;
+          };
+        };
+      };
+      responses: {
+        /** @description Friend request rejected */
+        200: {
+          content: never;
+        };
+        /** @description Request not found */
+        404: {
+          content: never;
+        };
+      };
+    };
+  };
+  "/social-api/friends": {
+    /** @description List current user friends */
+    get: {
+      responses: {
+        /** @description List of friends */
+        200: {
+          content: {
+            "application/json": ({
+                id: number;
+                username: string;
+                bio: string | null;
+                themeColor: string | null;
+              })[];
+          };
+        };
+      };
+    };
+  };
+  "/social-api/requests": {
+    /** @description List pending friend requests */
+    get: {
+      responses: {
+        /** @description List of pending requests */
+        200: {
+          content: {
+            "application/json": ({
+                id: number;
+                username: string;
+                bio: string | null;
+                themeColor: string | null;
+                requestId: number;
+                createdAt?: unknown;
+              })[];
+          };
+        };
+      };
+    };
+  };
+  "/social-api/outbound-requests": {
+    /** @description List outbound friend requests */
+    get: {
+      responses: {
+        /** @description List of outbound requests */
+        200: {
+          content: {
+            "application/json": ({
+                id: number;
+                username: string;
+                bio: string | null;
+                themeColor: string | null;
+                requestId: number;
+                createdAt?: unknown;
+              })[];
+          };
+        };
+      };
+    };
+  };
+  "/social-api/friends/{id}": {
+    /** @description Remove a friend */
+    delete: {
+      parameters: {
+        path: {
+          id: string;
+        };
+      };
+      responses: {
+        /** @description Friend removed */
+        200: {
+          content: never;
+        };
+        /** @description Friendship not found */
+        404: {
+          content: never;
+        };
+      };
+    };
+  };
+  "/social-api/friends/{id}/interactions": {
+    /** @description Get unified interactions with a friend */
+    get: {
+      parameters: {
+        path: {
+          id: string;
+        };
+      };
+      responses: {
+        /** @description Timeline of messages and trades */
+        200: {
+          content: {
+            "application/json": ({
+                id: number;
+                /** @enum {string} */
+                interactionType: "MESSAGE" | "TRADE";
+                senderId?: number | null;
+                receiverId: number;
+                initiatorId?: number | null;
+                content?: string | null;
+                status?: string | null;
+                isRead?: boolean | null;
+                createdAt?: unknown;
+              })[];
+          };
+        };
+      };
+    };
+  };
+  "/messages/{friendId}": {
+    /** Get messages with a friend */
+    get: {
+      parameters: {
+        path: {
+          friendId: string;
+        };
+      };
+      responses: {
+        /** @description List of messages */
+        200: {
+          content: {
+            "application/json": ({
+                id: number;
+                senderId: number;
+                receiverId: number;
+                content: string;
+                isRead: boolean | null;
+                createdAt?: unknown;
+              })[];
+          };
+        };
+      };
+    };
+  };
+  "/messages": {
+    /** Send a message */
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": {
+            receiverId: number;
+            content: string;
+          };
+        };
+      };
+      responses: {
+        /** @description Message sent */
+        201: {
+          content: {
+            "application/json": {
+              id: number;
+              senderId: number;
+              receiverId: number;
+              content: string;
+              isRead: boolean | null;
+              createdAt?: unknown;
+            };
+          };
+        };
+      };
+    };
+  };
+  "/messages/read/{friendId}": {
+    /** Mark messages as read */
+    post: {
+      parameters: {
+        path: {
+          friendId: string;
+        };
+      };
+      responses: {
+        /** @description Messages marked as read */
+        200: {
+          content: never;
+        };
+      };
+    };
+  };
 }
 
 export type webhooks = Record<string, never>;

@@ -3,7 +3,7 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"bun run src/index.ts\" \"cd frontend && npm run dev\""
+    "dev": "concurrently \"bun --watch src/index.ts\" \"cd frontend && npm run dev\""
   },
   "devDependencies": {
     "@types/bun": "latest",
