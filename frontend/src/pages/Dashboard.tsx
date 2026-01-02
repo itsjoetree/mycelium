@@ -8,10 +8,12 @@ import { toast } from 'sonner';
 import { TradeModal } from '../components/TradeModal';
 import { TradesList } from '../components/TradesList';
 import { ResourceModal } from '../components/ResourceModal';
+import { ConfirmationModal } from '../components/ConfirmationModal';
 import { UserMenu } from '../components/UserMenu';
 import { Logo } from '../components/Logo';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { MapView } from '../components/MapView';
+import { useDeleteResource } from '../hooks/useResources';
 
 export const Dashboard: React.FC = () => {
     useWebSocket();
@@ -21,9 +23,14 @@ export const Dashboard: React.FC = () => {
     // Resource Modal State
     const [resourceModalOpen, setResourceModalOpen] = useState(false);
 
-    // Trade Modal State
     const [tradeModalOpen, setTradeModalOpen] = useState(false);
-    const [selectedResource, setSelectedResource] = useState<{ id: number, title: string, ownerId: number, ownerUsername: string } | null>(null);
+    const [selectedResource, setSelectedResource] = useState<any>(null);
+
+    // Deletion Modal State
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [resourceToDelete, setResourceToDelete] = useState<number | null>(null);
+
+    const deleteResource = useDeleteResource();
 
     // Filter State
     const [view, setView] = useState<'marketplace' | 'inventory'>('marketplace');
@@ -34,13 +41,30 @@ export const Dashboard: React.FC = () => {
             toast.error("You already own this resource");
             return;
         }
-        setSelectedResource({
-            id: res.id,
-            title: res.title,
-            ownerId: res.ownerId,
-            ownerUsername: res.ownerUsername || `Node #${res.ownerId}`
-        });
+        setSelectedResource(res);
         setTradeModalOpen(true);
+    };
+
+    const openEdit = (res: any) => {
+        setSelectedResource(res);
+        setResourceModalOpen(true);
+    };
+
+    const handleDeleteClick = (id: number) => {
+        setResourceToDelete(id);
+        setDeleteModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!resourceToDelete) return;
+        try {
+            await deleteResource.mutateAsync(resourceToDelete);
+            toast.success("Signal removed");
+            setDeleteModalOpen(false);
+            setResourceToDelete(null);
+        } catch (err: any) {
+            toast.error(err?.message || "Failed to remove signal");
+        }
     };
 
     if (sessionLoading) return <div className="loading-screen">Authenticating...</div>;
@@ -145,14 +169,35 @@ export const Dashboard: React.FC = () => {
                                         <div className="mb-4">
                                             <span className="text-2xl font-bold block">{res.quantity} {res.unit}</span>
                                         </div>
-                                        <Button
-                                            variant={res.ownerId === session?.id ? 'outline' : 'secondary'}
-                                            className="w-full text-xs"
-                                            onClick={() => openTrade(res)}
-                                            disabled={res.ownerId === session?.id || res.status !== 'available'}
-                                        >
-                                            {res.ownerId === session?.id ? 'Owned Asset' : 'Initiate Trade'}
-                                        </Button>
+                                        <div className="flex gap-2">
+                                            {res.ownerId === session?.id ? (
+                                                <>
+                                                    <Button
+                                                        variant="secondary"
+                                                        className="flex-1 text-xs"
+                                                        onClick={() => openEdit(res)}
+                                                    >
+                                                        Edit
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        className="px-3 text-red-500 hover:text-red-400"
+                                                        onClick={() => handleDeleteClick(res.id)}
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                                                    </Button>
+                                                </>
+                                            ) : (
+                                                <Button
+                                                    variant="secondary"
+                                                    className="w-full text-xs"
+                                                    onClick={() => openTrade(res)}
+                                                    disabled={res.status !== 'available'}
+                                                >
+                                                    Initiate Trade
+                                                </Button>
+                                            )}
+                                        </div>
                                     </Card>
                                 ))}
                             </div>
@@ -177,10 +222,13 @@ export const Dashboard: React.FC = () => {
                     </aside>
                 </div>
 
-                {selectedResource && (
+                {selectedResource && tradeModalOpen && (
                     <TradeModal
                         isOpen={tradeModalOpen}
-                        onClose={() => setTradeModalOpen(false)}
+                        onClose={() => {
+                            setTradeModalOpen(false);
+                            setSelectedResource(null);
+                        }}
                         receiverId={selectedResource.ownerId}
                         receiverUsername={selectedResource.ownerUsername}
                         resourceId={selectedResource.id}
@@ -190,7 +238,25 @@ export const Dashboard: React.FC = () => {
 
                 <ResourceModal
                     isOpen={resourceModalOpen}
-                    onClose={() => setResourceModalOpen(false)}
+                    onClose={() => {
+                        setResourceModalOpen(false);
+                        setSelectedResource(null);
+                    }}
+                    initialData={view === 'inventory' ? selectedResource : null}
+                />
+
+                <ConfirmationModal
+                    isOpen={deleteModalOpen}
+                    onClose={() => {
+                        setDeleteModalOpen(false);
+                        setResourceToDelete(null);
+                    }}
+                    onConfirm={confirmDelete}
+                    title="Remove Signal?"
+                    message="This will permanently disconnect this resource from the network. This action cannot be undone."
+                    confirmText="Disconnect"
+                    variant="danger"
+                    isLoading={deleteResource.isPending}
                 />
             </main>
 

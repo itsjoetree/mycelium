@@ -272,6 +272,46 @@ export class TradeService {
         });
     }
 
+    static async invalidateTradesByResourceId(resourceId: number) {
+        return await db.transaction(async (tx) => {
+            // Find all PENDING trades involving this resource
+            const involvedTrades = await tx
+                .select({ id: trades.id, initiatorId: trades.initiatorId, receiverId: trades.receiverId })
+                .from(trades)
+                .innerJoin(tradeItems, eq(trades.id, tradeItems.tradeId))
+                .where(
+                    and(
+                        eq(trades.status, 'PENDING'),
+                        eq(tradeItems.resourceId, resourceId)
+                    )
+                );
+
+            if (involvedTrades.length === 0) return;
+
+            const tradeIds = [...new Set(involvedTrades.map(t => t.id))];
+
+            // Cancel these trades
+            await tx
+                .update(trades)
+                .set({ status: 'CANCELLED', updatedAt: new Date() })
+                .where(inArray(trades.id, tradeIds));
+
+            // Notify participants
+            for (const trade of involvedTrades) {
+                WebSocketManager.send(trade.initiatorId, {
+                    type: 'TRADE_CANCELLED',
+                    tradeId: trade.id,
+                    reason: 'One of the items in this trade was removed from the network'
+                });
+                WebSocketManager.send(trade.receiverId, {
+                    type: 'TRADE_CANCELLED',
+                    tradeId: trade.id,
+                    reason: 'One of the items in this trade was removed from the network'
+                });
+            }
+        });
+    }
+
     static async getTradesForUser(userId: number) {
         return await db.select().from(trades).where(
             // or(eq(trades.initiatorId, userId), eq(trades.receiverId, userId)) // Need to import 'or'

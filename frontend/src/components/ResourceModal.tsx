@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useCreateResource } from '../hooks/useResources';
+import React, { useState, useEffect } from 'react';
+import { useCreateResource, useUpdateResource } from '../hooks/useResources';
 import { Card } from './ui/Card';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
@@ -8,18 +8,50 @@ import { toast } from 'sonner';
 interface ResourceModalProps {
     isOpen: boolean;
     onClose: () => void;
+    initialData?: {
+        id: number;
+        title: string;
+        type: "seed" | "compost" | "harvest" | "labor";
+        quantity: number;
+        unit: string;
+        latitude?: number | string;
+        longitude?: number | string;
+    } | null;
 }
 
-export const ResourceModal: React.FC<ResourceModalProps> = ({ isOpen, onClose }) => {
+export const ResourceModal: React.FC<ResourceModalProps> = ({ isOpen, onClose, initialData }) => {
     const createResource = useCreateResource();
-    const [newResource, setNewResource] = useState({
+    const updateResource = useUpdateResource();
+    const [newResource, setNewResource] = useState<{
+        title: string;
+        quantity: number;
+        unit: string;
+        type: "seed" | "compost" | "harvest" | "labor";
+        latitude: number;
+        longitude: number;
+    }>({
         title: '',
         quantity: 10,
         unit: 'kg',
-        type: 'seed' as const,
+        type: 'seed',
         latitude: 0,
         longitude: 0
     });
+
+    useEffect(() => {
+        if (initialData) {
+            setNewResource({
+                title: initialData.title,
+                quantity: initialData.quantity,
+                unit: initialData.unit,
+                type: initialData.type,
+                latitude: Number(initialData.latitude) || 0,
+                longitude: Number(initialData.longitude) || 0
+            });
+        } else {
+            setNewResource({ title: '', quantity: 10, unit: 'kg', type: 'seed', latitude: 0, longitude: 0 });
+        }
+    }, [initialData, isOpen]);
 
     const [isLocating, setIsLocating] = useState(false);
 
@@ -43,15 +75,19 @@ export const ResourceModal: React.FC<ResourceModalProps> = ({ isOpen, onClose })
         );
     };
 
-    const handleCreate = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await createResource.mutateAsync(newResource);
-            toast.success('Resource created');
-            setNewResource({ title: '', quantity: 10, unit: 'kg', type: 'seed', latitude: 0, longitude: 0 });
+            if (initialData) {
+                await updateResource.mutateAsync({ id: initialData.id, body: newResource });
+                toast.success('Resource updated');
+            } else {
+                await createResource.mutateAsync(newResource);
+                toast.success('Resource created');
+            }
             onClose();
         } catch (err: any) {
-            toast.error(err?.message || 'Failed to create resource');
+            toast.error(err?.message || `Failed to ${initialData ? 'update' : 'create'} resource`);
         }
     };
 
@@ -60,8 +96,8 @@ export const ResourceModal: React.FC<ResourceModalProps> = ({ isOpen, onClose })
     return (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[2000] p-4">
             <Card className="w-full max-w-lg border-primary shadow-[0_0_50px_rgba(0,255,157,0.2)]">
-                <h2 className="mb-6">Publish New Signal</h2>
-                <form onSubmit={handleCreate}>
+                <h2 className="mb-6">{initialData ? 'Edit Signal' : 'Publish New Signal'}</h2>
+                <form onSubmit={handleSubmit}>
                     <Input
                         label="Title"
                         placeholder="What are you offering?"
@@ -135,11 +171,11 @@ export const ResourceModal: React.FC<ResourceModalProps> = ({ isOpen, onClose })
                     </div>
 
                     <div className="flex justify-end gap-4">
-                        <Button variant="ghost" type="button" onClick={onClose} disabled={createResource.isPending}>
+                        <Button variant="ghost" type="button" onClick={onClose} disabled={createResource.isPending || updateResource.isPending}>
                             Cancel
                         </Button>
-                        <Button type="submit" isLoading={createResource.isPending}>
-                            Publish Signal
+                        <Button type="submit" isLoading={createResource.isPending || updateResource.isPending}>
+                            {initialData ? 'Save Changes' : 'Publish Signal'}
                         </Button>
                     </div>
                 </form>

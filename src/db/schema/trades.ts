@@ -24,7 +24,7 @@ export const tradeItems = pgTable('trade_items', {
         .references(() => trades.id, { onDelete: 'cascade' }),
     resourceId: integer('resource_id')
         .notNull()
-        .references(() => resources.id),
+        .references(() => resources.id, { onDelete: 'cascade' }),
     // Start with simple full-item trades. Partial quantity trades would add more complexity.
 });
 

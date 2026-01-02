@@ -2,6 +2,7 @@ import { OpenAPIHono, z } from '@hono/zod-openapi';
 import { db } from '../../db';
 import { resources, users } from '../../db/schema';
 import { requireAuth } from '../auth/helper';
+import { TradeService } from '../trades/service';
 import { eq, desc, and, gte, lte } from 'drizzle-orm';
 
 const resourceApp = new OpenAPIHono();
@@ -55,6 +56,96 @@ resourceApp.openapi(
             .returning();
 
         return c.json(resource, 201);
+    },
+);
+
+const updateResourceSchema = z.object({
+    title: z.string().min(3).optional(),
+    description: z.string().optional(),
+    type: z.enum(['seed', 'compost', 'harvest', 'labor']).optional(),
+    quantity: z.number().positive().optional(),
+    unit: z.string().optional(),
+    latitude: z.number().optional(),
+    longitude: z.number().optional(),
+});
+
+resourceApp.openapi(
+    {
+        method: 'patch',
+        path: '/{id}',
+        description: 'Update a resource',
+        security: [{ cookieAuth: [] }],
+        request: {
+            params: z.object({ id: z.string() }),
+            body: {
+                content: {
+                    'application/json': {
+                        schema: updateResourceSchema,
+                    },
+                },
+            },
+        },
+        responses: {
+            200: { description: 'Resource updated' },
+            401: { description: 'Unauthorized' },
+            403: { description: 'Forbidden' },
+            404: { description: 'Resource not found' },
+        },
+    },
+    async (c) => {
+        const userId = await requireAuth(c);
+        const pid = c.req.param('id');
+        const resourceId = parseInt(pid!);
+        const updates = c.req.valid('json');
+
+        const [existing] = await db.select().from(resources).where(eq(resources.id, resourceId));
+        if (!existing) return c.json({ error: 'Resource not found' }, 404);
+        if (existing.ownerId !== userId) return c.json({ error: 'Forbidden' }, 403);
+
+        const [updated] = await db
+            .update(resources)
+            .set({
+                ...updates,
+                latitude: updates.latitude?.toString(),
+                longitude: updates.longitude?.toString(),
+            })
+            .where(eq(resources.id, resourceId))
+            .returning();
+
+        return c.json(updated, 200);
+    },
+);
+
+resourceApp.openapi(
+    {
+        method: 'delete',
+        path: '/{id}',
+        description: 'Delete a resource',
+        security: [{ cookieAuth: [] }],
+        request: {
+            params: z.object({ id: z.string() }),
+        },
+        responses: {
+            200: { description: 'Resource deleted' },
+            401: { description: 'Unauthorized' },
+            403: { description: 'Forbidden' },
+            404: { description: 'Resource not found' },
+        },
+    },
+    async (c) => {
+        const userId = await requireAuth(c);
+        const resourceId = parseInt(c.req.param('id')!);
+
+        const [existing] = await db.select().from(resources).where(eq(resources.id, resourceId));
+        if (!existing) return c.json({ error: 'Resource not found' }, 404);
+        if (existing.ownerId !== userId) return c.json({ error: 'Forbidden' }, 403);
+
+        // Invalidate any pending trades involving this resource first
+        await TradeService.invalidateTradesByResourceId(resourceId);
+
+        await db.delete(resources).where(eq(resources.id, resourceId));
+
+        return c.json({ success: true }, 200);
     },
 );
 
