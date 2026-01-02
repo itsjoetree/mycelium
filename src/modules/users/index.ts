@@ -48,7 +48,13 @@ userApp.openapi(
                     'application/json': {
                         schema: z.object({
                             bio: z.string().optional(),
-                            themeColor: z.string().optional(),
+                            themeColor: z.enum([
+                                '#00ff9d', // Neon Mycelium
+                                '#ff2a6d', // Nebula Pink
+                                '#00e5ff', // Quantum Blue
+                                '#d500f9', // Void Purple
+                                '#ff9100', // Solar Orange
+                            ]).optional(),
                         }),
                     },
                 },

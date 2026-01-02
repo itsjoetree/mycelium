@@ -20,7 +20,7 @@ export const SocialLoading: React.FC<{ message?: string }> = ({ message = 'Synch
                 <div className="w-32 h-32 border-2 border-primary/20 rounded-full animate-ping-slow" />
                 <div className="absolute inset-0 w-32 h-32 border-2 border-primary/40 rounded-full animate-spin-slow border-t-primary" />
                 <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center border border-primary/50 shadow-[0_0_20px_rgba(0,255,157,0.3)]">
+                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center border border-primary/50 shadow-[0_0_20px_rgb(var(--accent-rgb)/0.3)]">
                         <div className="w-8 h-8 text-primary animate-pulse">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />

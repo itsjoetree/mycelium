@@ -104,7 +104,7 @@ export const NotificationBell: React.FC = () => {
                                         </div>
                                         <p className="text-xs text-text leading-relaxed">{n.content}</p>
                                         {!n.isRead && (
-                                            <div className="mt-2 w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_5px_rgba(0,255,157,0.5)]"></div>
+                                            <div className="mt-2 w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_5px_rgb(var(--accent-rgb)/0.5)]"></div>
                                         )}
                                     </div>
                                 ))

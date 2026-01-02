@@ -37,7 +37,7 @@ export const SocialLogsModal: React.FC<SocialLogsModalProps> = ({ isOpen, onClos
                 <div className="p-4 border-b border-white/5 flex justify-between items-center bg-black/40">
                     <div className="flex items-center gap-3">
                         <div
-                            className="w-2 h-2 rounded-full animate-pulse shadow-[0_0_8px_rgba(0,255,157,0.5)]"
+                            className="w-2 h-2 rounded-full animate-pulse shadow-[0_0_8px_rgb(var(--accent-rgb)/0.5)]"
                             style={{ backgroundColor: user.themeColor || '#00ff9d' }}
                         />
                         <h2 className="text-sm font-bold uppercase tracking-widest font-mono">

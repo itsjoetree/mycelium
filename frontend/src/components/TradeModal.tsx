@@ -85,7 +85,7 @@ export const TradeModal: React.FC<TradeModalProps> = ({
 
     return (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[2000] p-4">
-            <Card className="w-full max-w-5xl border-primary/30 shadow-[0_0_100px_rgba(0,255,157,0.1)] max-h-[90vh] flex flex-col overflow-hidden bg-background">
+            <Card className="w-full max-w-5xl border-primary/30 shadow-[0_0_100px_var(--accent-glow)] max-h-[90vh] flex flex-col overflow-hidden bg-background">
                 <div className="p-6 border-b border-glass-surface flex justify-between items-center">
                     <div>
                         <h3 className="text-xl font-bold text-glow-primary">Initiate Barter Protocol</h3>
@@ -101,7 +101,7 @@ export const TradeModal: React.FC<TradeModalProps> = ({
                     <div className="flex-1 border-r border-glass-surface flex flex-col p-6 overflow-hidden">
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_#00ff9d]" />
+                                <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_var(--accent)]" />
                                 <h4 className="text-xs uppercase font-bold tracking-widest">Target Inventory</h4>
                             </div>
                             <span className="text-[0.6rem] font-mono text-primary/60">{selectedFriendResourceIds.length} SELECTED</span>
@@ -127,7 +127,7 @@ export const TradeModal: React.FC<TradeModalProps> = ({
                                         onClick={() => toggleFriendResource(res.id)}
                                         className={`w-full flex justify-between items-center p-3 rounded-lg border transition-all text-left group
                                             ${selectedFriendResourceIds.includes(res.id)
-                                                ? 'bg-primary/20 border-primary shadow-[0_0_15px_rgba(0,255,157,0.1)]'
+                                                ? 'bg-primary/20 border-primary shadow-[0_0_15px_var(--accent-glow)]'
                                                 : 'bg-black/20 border-white/5 hover:border-primary/40 hover:bg-white/5'}`}
                                     >
                                         <div className="flex flex-col min-w-0">
@@ -154,7 +154,7 @@ export const TradeModal: React.FC<TradeModalProps> = ({
                         <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center gap-2">
                                 <span className="w-2 h-2 rounded-full bg-secondary shadow-[0_0_10px_#00b7ff]" />
-                                <h4 className="text-xs uppercase font-bold tracking-widest">Your Offerings</h4>
+                                <h4 className="text-xs uppercase font-bold tracking-widest text-secondary">Your Offerings</h4>
                             </div>
                             <span className="text-[0.6rem] font-mono text-secondary/60">{offeredIds.length} SELECTED</span>
                         </div>
@@ -217,7 +217,7 @@ export const TradeModal: React.FC<TradeModalProps> = ({
                             onClick={handleTrade}
                             isLoading={isSubmitting}
                             disabled={selectedFriendResourceIds.length === 0}
-                            className="uppercase tracking-widest text-[0.7rem] px-8 shadow-[0_0_20px_rgba(0,255,157,0.2)]"
+                            className="uppercase tracking-widest text-[0.7rem] px-8 shadow-[0_0_20px_var(--accent-glow)]"
                         >
                             Commit Proposal
                         </Button>
@@ -227,7 +227,7 @@ export const TradeModal: React.FC<TradeModalProps> = ({
 
             <style>{`
                 .text-glow-primary {
-                    text-shadow: 0 0 10px rgba(0, 255, 157, 0.4);
+                    text-shadow: 0 0 10px var(--accent-glow);
                 }
                 .custom-scrollbar::-webkit-scrollbar {
                     width: 4px;
@@ -240,7 +240,7 @@ export const TradeModal: React.FC<TradeModalProps> = ({
                     border-radius: 2px;
                 }
                 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                    background: rgba(0, 255, 157, 0.2);
+                    background: var(--accent-glow);
                 }
             `}</style>
         </div>

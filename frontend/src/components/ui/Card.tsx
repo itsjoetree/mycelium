@@ -8,7 +8,7 @@ export const Card: React.FC<{ children: React.ReactNode; className?: string; sty
             className
         )} style={style}>
             {/* Gradient overlay mimicking ::before */}
-            <div className="absolute inset-[-1px] rounded-md bg-gradient-to-tr from-transparent via-[rgba(0,255,157,0.1)] to-transparent -z-10 opacity-50 pointer-events-none" />
+            <div className="absolute inset-[-1px] rounded-md bg-gradient-to-tr from-transparent via-[rgb(var(--accent-rgb)/0.1)] to-transparent -z-10 opacity-50 pointer-events-none" />
             {children}
         </div>
     );

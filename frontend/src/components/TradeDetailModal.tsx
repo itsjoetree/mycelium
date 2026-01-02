@@ -54,7 +54,7 @@ export const TradeDetailModal: React.FC<TradeDetailModalProps> = ({
 
     return (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[2000] p-4">
-            <Card className="w-full max-w-2xl border-primary/30 shadow-[0_0_100px_rgba(0,255,157,0.1)] overflow-hidden flex flex-col max-h-[90vh]">
+            <Card className="w-full max-w-2xl border-primary/30 shadow-[0_0_100px_var(--accent-glow)] overflow-hidden flex flex-col max-h-[90vh]">
                 <div className="p-6 border-b border-glass-surface flex justify-between items-center bg-black/20">
                     <div>
                         <h3 className="text-xl font-bold text-glow-primary">Protocol Inspection</h3>
@@ -108,7 +108,7 @@ export const TradeDetailModal: React.FC<TradeDetailModalProps> = ({
                                 {/* Requested */}
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_5px_#00ff9d]" />
+                                        <span className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_5px_var(--accent)]" />
                                         <h4 className="text-[0.6rem] uppercase font-bold tracking-widest text-primary">Requested Assets</h4>
                                     </div>
                                     <div className="space-y-2">
@@ -153,7 +153,7 @@ export const TradeDetailModal: React.FC<TradeDetailModalProps> = ({
                                     </Button>
                                     <Button
                                         onClick={() => handleAction('accept')}
-                                        className="shadow-[0_0_20px_rgba(0,255,157,0.2)] uppercase tracking-widest text-[0.7rem] px-8"
+                                        className="shadow-[0_0_20px_var(--accent-glow)] uppercase tracking-widest text-[0.7rem] px-8"
                                         isLoading={acceptTrade.isPending}
                                     >
                                         Finalize Protocol
@@ -167,7 +167,7 @@ export const TradeDetailModal: React.FC<TradeDetailModalProps> = ({
 
             <style>{`
                 .text-glow-primary {
-                    text-shadow: 0 0 10px rgba(0, 255, 157, 0.4);
+                    text-shadow: 0 0 10px var(--accent-glow);
                 }
                 .custom-scrollbar::-webkit-scrollbar {
                     width: 4px;
@@ -180,7 +180,7 @@ export const TradeDetailModal: React.FC<TradeDetailModalProps> = ({
                     border-radius: 2px;
                 }
                 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                    background: rgba(0, 255, 157, 0.2);
+                    background: var(--accent-glow);
                 }
             `}</style>
         </div>

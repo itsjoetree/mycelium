@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { client } from '../lib/api';
+import { useUserSession } from './useAuth';
 
 export function useUserProfile(id: number | string | undefined) {
     return useQuery({
@@ -17,6 +18,7 @@ export function useUserProfile(id: number | string | undefined) {
 }
 
 export function useMyProfile() {
+    const { data: session } = useUserSession();
     return useQuery({
         queryKey: ['profile', 'me'],
         queryFn: async () => {
@@ -24,6 +26,7 @@ export function useMyProfile() {
             if (error) throw error;
             return data;
         },
+        enabled: !!session,
     });
 }
 

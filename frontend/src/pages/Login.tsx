@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { useLogin, useRegister } from '../hooks/useAuth';
+import { useLogin, useRegister, useUserSession } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Logo } from '../components/Logo';
@@ -16,6 +16,13 @@ export const Login: React.FC = () => {
     const navigate = useNavigate();
     const login = useLogin();
     const register = useRegister();
+    const { data: session } = useUserSession();
+
+    useEffect(() => {
+        if (session) {
+            navigate('/dashboard');
+        }
+    }, [session, navigate]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

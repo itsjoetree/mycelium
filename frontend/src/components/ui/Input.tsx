@@ -12,7 +12,7 @@ export const Input: React.FC<InputProps> = ({ label, error, className, ...props 
             {label && <label className="text-xs uppercase text-text-muted tracking-wider font-semibold">{label}</label>}
             <input
                 className={cn(
-                    "bg-[rgba(5,20,18,0.6)] border border-primary-dirty px-4 py-3 rounded-sm text-text-main font-mono outline-none transition-all duration-300 focus:border-primary focus:shadow-[0_0_15px_rgba(0,255,157,0.1)] focus:bg-[rgba(5,20,18,0.8)]",
+                    "bg-[rgba(5,20,18,0.6)] border border-primary-dirty px-4 py-3 rounded-sm text-text-main font-mono outline-none transition-all duration-300 focus:border-primary focus:shadow-[0_0_15px_rgb(var(--accent-rgb)/0.1)] focus:bg-[rgba(5,20,18,0.8)]",
                     error && 'border-tertiary',
                     className
                 )}

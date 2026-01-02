@@ -71,7 +71,7 @@ export const TradesList: React.FC = () => {
                     onClick={() => setView('log')}
                     className={`flex-1 py-1.5 text-[10px] uppercase font-bold tracking-widest rounded border transition-all duration-200
                         ${view === 'log'
-                            ? 'bg-primary/20 text-primary border-primary/30 shadow-[0_0_10px_rgba(0,255,157,0.1)]'
+                            ? 'bg-primary/20 text-primary border-primary/30 shadow-[0_0_10px_rgb(var(--accent-rgb)/0.1)]'
                             : 'border-transparent text-text-muted hover:text-text hover:bg-white/5'}`}
                 >
                     Log ({historicalTrades.length})

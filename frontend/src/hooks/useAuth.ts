@@ -14,6 +14,7 @@ export function useRegister() {
 }
 
 export function useLogin() {
+    const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (body: { email: string; password: string }) => {
             const { data, error } = await client.POST('/auth/login', {
@@ -21,6 +22,10 @@ export function useLogin() {
             });
             if (error) throw error;
             return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['session'] });
+            queryClient.invalidateQueries({ queryKey: ['profile', 'me'] });
         },
     });
 }

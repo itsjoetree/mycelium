@@ -8,13 +8,15 @@ export default {
         extend: {
             colors: {
                 bg: {
-                    deep: '#051412',
-                    base: '#0a1f1c',
-                    surface: '#112926',
+                    deep: 'var(--bg-deep)',
+                    base: 'var(--bg-base)',
+                    surface: 'var(--bg-surface)',
                 },
                 primary: {
-                    DEFAULT: '#00ff9d',
-                    dirty: 'rgba(0, 255, 157, 0.2)', // For glass borders
+                    DEFAULT: 'rgb(var(--accent-rgb) / <alpha-value>)',
+                    dirty: 'var(--accent-border)',
+                    glow: 'var(--accent-glow)',
+                    border: 'var(--accent-border)',
                 },
                 secondary: {
                     DEFAULT: '#bf00ff',
@@ -23,11 +25,11 @@ export default {
                     DEFAULT: '#ff0055',
                 },
                 text: {
-                    main: '#e0f2f0',
-                    muted: '#8da6a3',
+                    main: 'var(--text-main)',
+                    muted: 'var(--text-muted)',
                 },
                 glass: {
-                    surface: 'rgba(17, 41, 38, 0.6)',
+                    surface: 'var(--glass-surface)',
                 }
             },
             fontFamily: {
