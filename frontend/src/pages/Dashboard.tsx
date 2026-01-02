@@ -13,6 +13,7 @@ import { UserMenu } from '../components/UserMenu';
 import { Logo } from '../components/Logo';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { MapView } from '../components/MapView';
+import { NotificationBell } from '../components/NotificationBell';
 import { useDeleteResource } from '../hooks/useResources';
 
 export const Dashboard: React.FC = () => {
@@ -117,7 +118,10 @@ export const Dashboard: React.FC = () => {
                     <Logo className="w-10 h-10" />
                     <div className="text-2xl font-bold text-primary">Mycelium Network</div>
                 </div>
-                <UserMenu />
+                <div className="flex items-center gap-4">
+                    <NotificationBell />
+                    <UserMenu />
+                </div>
             </header>
 
             <main>

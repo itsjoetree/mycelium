@@ -6,6 +6,7 @@ import { errorHandler, notFoundHandler } from './lib/middleware';
 import authApp from './modules/auth';
 import resourceApp from './modules/resources';
 import tradeApp from './modules/trades';
+import notificationApp from './modules/notifications';
 
 import { rateLimiter } from './lib/rate-limit';
 
@@ -19,6 +20,7 @@ app.notFound(notFoundHandler);
 app.route('/auth', authApp);
 app.route('/resources', resourceApp);
 app.route('/trades', tradeApp);
+app.route('/notifications', notificationApp);
 
 app.get('/', (c) => {
     return c.json({

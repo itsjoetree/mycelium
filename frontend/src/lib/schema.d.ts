@@ -3,479 +3,433 @@
  * Do not make direct changes to the file.
  */
 
+
 export interface paths {
-    "/auth/register": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+  "/auth/register": {
+    /** @description Register a new user */
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": {
+            username: string;
+            /** Format: email */
+            email: string;
+            password: string;
+          };
         };
-        get?: never;
-        put?: never;
-        /** @description Register a new user */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": {
-                        username: string;
-                        /** Format: email */
-                        email: string;
-                        password: string;
-                    };
-                };
-            };
-            responses: {
-                /** @description User created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Invalid input or user already exists */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+      };
+      responses: {
+        /** @description User created */
+        201: {
+          content: never;
         };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        /** @description Invalid input or user already exists */
+        400: {
+          content: never;
+        };
+      };
     };
-    "/auth/login": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+  };
+  "/auth/login": {
+    /** @description Login user */
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": {
+            /** Format: email */
+            email: string;
+            password: string;
+          };
         };
-        get?: never;
-        put?: never;
-        /** @description Login user */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": {
-                        /** Format: email */
-                        email: string;
-                        password: string;
-                    };
-                };
-            };
-            responses: {
-                /** @description Logged in */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Invalid credentials */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+      };
+      responses: {
+        /** @description Logged in */
+        200: {
+          content: never;
         };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        /** @description Invalid credentials */
+        401: {
+          content: never;
+        };
+      };
     };
-    "/auth/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Get current user session */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
+  };
+  "/auth/me": {
+    /** @description Get current user session */
+    get: {
+      responses: {
+        /** @description Current user info */
+        200: {
+          content: {
+            "application/json": {
+              id: number;
+              username: string;
+              email: string;
             };
-            requestBody?: never;
-            responses: {
-                /** @description Current user info */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            id: number;
-                            username: string;
-                            email: string;
-                        };
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+          };
         };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        /** @description Unauthorized */
+        401: {
+          content: never;
+        };
+      };
     };
-    "/auth/logout": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+  };
+  "/auth/logout": {
+    /** @description Logout current user */
+    post: {
+      responses: {
+        /** @description Logged out successfully */
+        200: {
+          content: never;
         };
-        get?: never;
-        put?: never;
-        /** @description Logout current user */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Logged out successfully */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        /** @description Unauthorized */
+        401: {
+          content: never;
         };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/resources": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+  };
+  "/resources": {
+    /** @description List resources */
+    get: {
+      parameters: {
+        query?: {
+          type?: "seed" | "compost" | "harvest" | "labor";
+          search?: string;
+          ownerId?: string;
+          minQuantity?: string;
         };
-        /** @description List resources */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of resources */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            id: number;
-                            title: string;
-                            description?: string;
-                            /** @enum {string} */
-                            type: "seed" | "compost" | "harvest" | "labor";
-                            quantity: number;
-                            unit: string;
-                            ownerId: number;
-                            status: string;
-                            latitude?: number;
-                            longitude?: number;
-                            createdAt: string;
-                        }[];
-                    };
-                };
-            };
+      };
+      responses: {
+        /** @description List of resources */
+        200: {
+          content: {
+            "application/json": ({
+                id: number;
+                title: string;
+                description?: string;
+                /** @enum {string} */
+                type: "seed" | "compost" | "harvest" | "labor";
+                quantity: number;
+                unit: string;
+                ownerId: number;
+                ownerUsername: string | null;
+                status: string;
+                latitude?: number;
+                longitude?: number;
+                createdAt: string;
+              })[];
+          };
         };
-        put?: never;
-        /** @description Create a new resource */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": {
-                        title: string;
-                        description?: string;
-                        /** @enum {string} */
-                        type: "seed" | "compost" | "harvest" | "labor";
-                        quantity: number;
-                        unit: string;
-                        latitude?: number;
-                        longitude?: number;
-                    };
-                };
-            };
-            responses: {
-                /** @description Resource created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/trades": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    /** @description Create a new resource */
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": {
+            title: string;
+            description?: string;
+            /** @enum {string} */
+            type: "seed" | "compost" | "harvest" | "labor";
+            quantity: number;
+            unit: string;
+            latitude?: number;
+            longitude?: number;
+          };
         };
-        /** @description List user trades */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of trades */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": {
-                            id: number;
-                            initiatorId: number;
-                            receiverId: number;
-                            status: string;
-                            createdAt: string;
-                        }[];
-                    };
-                };
-            };
+      };
+      responses: {
+        /** @description Resource created */
+        201: {
+          content: never;
         };
-        put?: never;
-        /** @description Propose a new trade */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: {
-                content: {
-                    "application/json": {
-                        receiverId: number;
-                        resourceIds: number[];
-                    };
-                };
-            };
-            responses: {
-                /** @description Trade created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Invalid resources */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+        /** @description Unauthorized */
+        401: {
+          content: never;
         };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
-    "/trades/{id}/accept": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+  };
+  "/resources/{id}": {
+    /** @description Delete a resource */
+    delete: {
+      parameters: {
+        path: {
+          id: string;
         };
-        get?: never;
-        put?: never;
-        /** @description Accept a trade */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Trade accepted */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Conflict - Resources unavailable */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+      };
+      responses: {
+        /** @description Resource deleted */
+        200: {
+          content: never;
         };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+        /** @description Unauthorized */
+        401: {
+          content: never;
+        };
+        /** @description Forbidden */
+        403: {
+          content: never;
+        };
+        /** @description Resource not found */
+        404: {
+          content: never;
+        };
+      };
     };
-    "/trades/{id}/cancel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    /** @description Update a resource */
+    patch: {
+      parameters: {
+        path: {
+          id: string;
         };
-        get?: never;
-        put?: never;
-        /** @description Cancel a trade */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Trade cancelled */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
+      };
+      requestBody?: {
+        content: {
+          "application/json": {
+            title?: string;
+            description?: string;
+            /** @enum {string} */
+            type?: "seed" | "compost" | "harvest" | "labor";
+            quantity?: number;
+            unit?: string;
+            latitude?: number;
+            longitude?: number;
+          };
         };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
+      responses: {
+        /** @description Resource updated */
+        200: {
+          content: never;
+        };
+        /** @description Unauthorized */
+        401: {
+          content: never;
+        };
+        /** @description Forbidden */
+        403: {
+          content: never;
+        };
+        /** @description Resource not found */
+        404: {
+          content: never;
+        };
+      };
     };
-    "/trades/{id}/reject": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+  };
+  "/trades": {
+    /** @description List user trades */
+    get: {
+      responses: {
+        /** @description List of trades */
+        200: {
+          content: {
+            "application/json": ({
+                id: number;
+                initiatorId: number;
+                receiverId: number;
+                initiatorUsername: string | null;
+                receiverUsername: string | null;
+                resources: {
+                    title: string;
+                    quantity: number;
+                    unit: string;
+                  }[];
+                status: string;
+                createdAt?: unknown;
+              })[];
+          };
         };
-        get?: never;
-        put?: never;
-        /** @description Reject a trade */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Trade rejected */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+      };
     };
+    /** @description Propose a new trade */
+    post: {
+      requestBody?: {
+        content: {
+          "application/json": {
+            receiverId: number;
+            resourceIds: number[];
+          };
+        };
+      };
+      responses: {
+        /** @description Trade created */
+        201: {
+          content: never;
+        };
+        /** @description Invalid resources */
+        400: {
+          content: never;
+        };
+      };
+    };
+  };
+  "/trades/{id}": {
+    /** @description Get trade details */
+    get: {
+      parameters: {
+        path: {
+          id: string;
+        };
+      };
+      responses: {
+        /** @description Trade details */
+        200: {
+          content: {
+            "application/json": {
+              id: number;
+              initiatorId: number;
+              receiverId: number;
+              status: string;
+              createdAt?: unknown;
+              initiatorUsername: string | null;
+              receiverUsername: string | null;
+              resources: {
+                  title: string;
+                  quantity: number;
+                  unit: string;
+                  ownerId: number;
+                  type: string;
+                }[];
+            };
+          };
+        };
+        /** @description Trade not found */
+        404: {
+          content: never;
+        };
+      };
+    };
+  };
+  "/trades/{id}/accept": {
+    /** @description Accept a trade */
+    post: {
+      parameters: {
+        path: {
+          id: string;
+        };
+      };
+      responses: {
+        /** @description Trade accepted */
+        200: {
+          content: never;
+        };
+        /** @description Conflict - Resources unavailable */
+        409: {
+          content: never;
+        };
+      };
+    };
+  };
+  "/trades/{id}/cancel": {
+    /** @description Cancel a pending trade */
+    post: {
+      parameters: {
+        path: {
+          id: string;
+        };
+      };
+      responses: {
+        /** @description Trade cancelled */
+        200: {
+          content: never;
+        };
+        /** @description Forbidden */
+        403: {
+          content: never;
+        };
+      };
+    };
+  };
+  "/trades/{id}/reject": {
+    /** @description Reject a pending trade */
+    post: {
+      parameters: {
+        path: {
+          id: string;
+        };
+      };
+      responses: {
+        /** @description Trade rejected */
+        200: {
+          content: never;
+        };
+        /** @description Forbidden */
+        403: {
+          content: never;
+        };
+      };
+    };
+  };
+  "/notifications": {
+    /** @description List user notifications */
+    get: {
+      responses: {
+        /** @description List of notifications */
+        200: {
+          content: {
+            "application/json": ({
+                id: number;
+                userId: number;
+                type: string;
+                content: string;
+                isRead: boolean;
+                tradeId: number | null;
+                resourceId: number | null;
+                createdAt: string;
+              })[];
+          };
+        };
+      };
+    };
+  };
+  "/notifications/{id}/read": {
+    /** @description Mark a notification as read */
+    patch: {
+      parameters: {
+        path: {
+          id: string;
+        };
+      };
+      responses: {
+        /** @description Notification updated */
+        200: {
+          content: never;
+        };
+      };
+    };
+  };
+  "/notifications/read-all": {
+    /** @description Mark all notifications as read */
+    post: {
+      responses: {
+        /** @description All notifications updated */
+        200: {
+          content: never;
+        };
+      };
+    };
+  };
 }
+
 export type webhooks = Record<string, never>;
+
 export interface components {
-    schemas: never;
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+  schemas: {
+  };
+  responses: never;
+  parameters: {
+  };
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
+
 export type $defs = Record<string, never>;
+
+export type external = Record<string, never>;
+
 export type operations = Record<string, never>;

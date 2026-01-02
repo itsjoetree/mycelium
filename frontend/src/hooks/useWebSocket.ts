@@ -51,6 +51,10 @@ export function useWebSocket() {
                     queryClient.invalidateQueries({ queryKey: ['trades'] });
                     queryClient.invalidateQueries({ queryKey: ['resources'] });
                 }
+
+                if (data.type === 'NOTIFICATION_RECEIVED') {
+                    queryClient.invalidateQueries({ queryKey: ['notifications'] });
+                }
             } catch (err) {
                 console.error('Failed to parse WS message', err);
             }

@@ -5,8 +5,7 @@ import { eq, inArray, and, or, desc, not } from 'drizzle-orm';
 import { HTTPException } from 'hono/http-exception';
 import { WebSocketManager } from '../../lib/ws';
 import { tradeQueue } from '../../lib/queue';
-
-const MAX_TOTAL_QUANTITY_PER_TRADE = 1000;
+import { NotificationService } from '../notifications/service';
 
 const initiators = alias(users, 'initiators');
 const receivers = alias(users, 'receivers');
@@ -67,9 +66,61 @@ export class TradeService {
         });
     }
 
+    static async getTradeById(tradeId: number, userId: number) {
+        const results = await db
+            .select({
+                id: trades.id,
+                initiatorId: trades.initiatorId,
+                receiverId: trades.receiverId,
+                status: trades.status,
+                createdAt: trades.createdAt,
+                initiatorUsername: initiators.username,
+                receiverUsername: receivers.username,
+                resourceTitle: resources.title,
+                resourceQuantity: resources.quantity,
+                resourceUnit: resources.unit,
+                resourceOwnerId: resources.ownerId,
+                resourceType: resources.type,
+            })
+            .from(trades)
+            .leftJoin(initiators, eq(trades.initiatorId, initiators.id))
+            .leftJoin(receivers, eq(trades.receiverId, receivers.id))
+            .leftJoin(tradeItems, eq(trades.id, tradeItems.tradeId))
+            .leftJoin(resources, eq(tradeItems.resourceId, resources.id))
+            .where(
+                and(
+                    eq(trades.id, tradeId),
+                    or(eq(trades.initiatorId, userId), eq(trades.receiverId, userId))
+                )
+            );
+
+        if (results.length === 0) return null;
+
+        const tradeData = {
+            id: results[0].id,
+            initiatorId: results[0].initiatorId,
+            receiverId: results[0].receiverId,
+            status: results[0].status,
+            createdAt: results[0].createdAt,
+            initiatorUsername: results[0].initiatorUsername,
+            receiverUsername: results[0].receiverUsername,
+            resources: results
+                .filter(r => r.resourceTitle)
+                .map(r => ({
+                    title: r.resourceTitle!,
+                    quantity: r.resourceQuantity!,
+                    unit: r.resourceUnit!,
+                    ownerId: r.resourceOwnerId!,
+                    type: r.resourceType!,
+                })),
+        };
+
+        return tradeData;
+    }
+
     static async createTrade(initiatorId: number, receiverId: number, resourceIds: number[]) {
-        return await db.transaction(async (tx) => {
-            // 0. Prevent duplicate pending trades for these resources by the same initiator
+        const trade = await db.transaction(async (tx) => {
+            // 0. Prevent duplicate pending trades
             const existingPending = await tx
                 .select({ id: trades.id })
                 .from(trades)
@@ -86,8 +137,7 @@ export class TradeService {
                 throw new HTTPException(400, { message: 'You already have a pending proposal for one or more of these resources' });
             }
 
-            // 1. Verify all resources exist and belong to either initiator or receiver
-
+            // 1. Verify existence and availability
             const foundResources = await tx
                 .select()
                 .from(resources)
@@ -97,248 +147,188 @@ export class TradeService {
                 throw new HTTPException(400, { message: 'One or more resources not found' });
             }
 
-            // Check if any resource is not available
             const unavailable = foundResources.filter((r) => r.status !== 'available');
             if (unavailable.length > 0) {
                 throw new HTTPException(400, { message: `Resources ${unavailable.map(r => r.id).join(', ')} are not available` });
             }
 
-            // Enforce ownership: Resources must belong to either initiator or receiver
+            // Enforce ownership
             const invalidOwner = foundResources.find(
                 (r) => r.ownerId !== initiatorId && r.ownerId !== receiverId
             );
             if (invalidOwner) {
-                throw new HTTPException(400, {
-                    message: `Resource ${invalidOwner.id} does not belong to trade participants`
-                });
+                throw new HTTPException(400, { message: `Resource ${invalidOwner.id} does not belong to trade participants` });
             }
 
-            // 2. Create the trade record
+            // 2. Create trade
             const [trade] = await tx
                 .insert(trades)
-                .values({
-                    initiatorId,
-                    receiverId,
-                    status: 'PENDING',
-                })
+                .values({ initiatorId, receiverId, status: 'PENDING' })
                 .returning();
 
-            // 3. Create trade items
+            // 3. Create items
             await tx.insert(tradeItems).values(
-                resourceIds.map((rid) => ({
-                    tradeId: trade.id,
-                    resourceId: rid,
-                }))
+                resourceIds.map((rid) => ({ tradeId: trade.id, resourceId: rid }))
             );
-
-            // Notify receiver
-            WebSocketManager.send(receiverId, { type: 'TRADE_PROPOSED', tradeId: trade.id });
-
-            // Schedule expiration (e.g. 10 seconds for demo purposes, normally 24h)
-            // 24h = 86400000 ms
-            // Demo = 5000 ms
-            await tradeQueue.add('expire-trade', { tradeId: trade.id }, { delay: 86400000 });
 
             return trade;
         });
+
+        // 4. Notifications
+        const initiator = await db.query.users.findFirst({
+            where: eq(users.id, initiatorId),
+            columns: { username: true }
+        });
+
+        WebSocketManager.send(receiverId, { type: 'TRADE_PROPOSED', tradeId: trade.id });
+        await NotificationService.createNotification({
+            userId: receiverId,
+            type: 'TRADE_PROPOSED',
+            content: `@${initiator?.username || 'Someone'} started a trade with you!`,
+            tradeId: trade.id,
+        });
+
+        await tradeQueue.add('expire-trade', { tradeId: trade.id }, { delay: 86400000 });
+
+        return trade;
     }
 
     static async acceptTrade(tradeId: number, userId: number) {
-        return await db.transaction(async (tx) => {
-            // 1. Fetch trade
-            const [trade] = await tx
-                .select()
-                .from(trades)
-                .where(eq(trades.id, tradeId));
-
+        const { updatedTrade, otherTradesResult, otherTradeIds } = await db.transaction(async (tx) => {
+            const [trade] = await tx.select().from(trades).where(eq(trades.id, tradeId));
             if (!trade) throw new HTTPException(404, { message: 'Trade not found' });
+            if (trade.receiverId !== userId) throw new HTTPException(403, { message: 'Only receiver can accept trade' });
+            if (trade.status !== 'PENDING') throw new HTTPException(400, { message: 'Trade is not pending' });
 
-            // Only receiver can accept
-            if (trade.receiverId !== userId) {
-                throw new HTTPException(403, { message: 'Only receiver can accept trade' });
-            }
-
-            if (trade.status !== 'PENDING') {
-                throw new HTTPException(400, { message: 'Trade is not pending' });
-            }
-
-            // 2. Get all items in trade
-            const items = await tx
-                .select()
-                .from(tradeItems)
-                .where(eq(tradeItems.tradeId, tradeId));
-
+            const items = await tx.select().from(tradeItems).where(eq(tradeItems.tradeId, tradeId));
             const resourceIds = items.map((i) => i.resourceId);
-
-            // 3. Lock & Validate Resources
-            // effectively "Optimistic Locking" by checking status again inside transaction
-            const currentResources = await tx
-                .select()
-                .from(resources)
-                .where(inArray(resources.id, resourceIds));
+            const currentResources = await tx.select().from(resources).where(inArray(resources.id, resourceIds));
 
             const unavailable = currentResources.filter((r) => r.status !== 'available');
-            if (unavailable.length > 0) {
-                // Fail the trade if resources disappeared or were traded elsewhere
-                throw new HTTPException(409, { message: 'Some resources are no longer available' });
-            }
+            if (unavailable.length > 0) throw new HTTPException(409, { message: 'Some resources are no longer available' });
 
-            // 4. Update Resource Status and Ownership (Bidirectional Swap)
-            // Separate resources by original owner to prevent subsequent updates from overwriting
             const receiverResources = currentResources.filter(r => r.ownerId === trade.receiverId).map(r => r.id);
             const initiatorResources = currentResources.filter(r => r.ownerId === trade.initiatorId).map(r => r.id);
 
-            // Transfer items to Initiator
             if (receiverResources.length > 0) {
-                await tx
-                    .update(resources)
-                    .set({
-                        ownerId: trade.initiatorId,
-                        status: 'available',
-                        updatedAt: new Date()
-                    })
-                    .where(inArray(resources.id, receiverResources));
+                await tx.update(resources).set({ ownerId: trade.initiatorId, status: 'available', updatedAt: new Date() }).where(inArray(resources.id, receiverResources));
             }
-
-            // Transfer items to Receiver
             if (initiatorResources.length > 0) {
-                await tx
-                    .update(resources)
-                    .set({
-                        ownerId: trade.receiverId,
-                        status: 'available',
-                        updatedAt: new Date()
-                    })
-                    .where(inArray(resources.id, initiatorResources));
+                await tx.update(resources).set({ ownerId: trade.receiverId, status: 'available', updatedAt: new Date() }).where(inArray(resources.id, initiatorResources));
             }
 
-            // 5. Update Trade Status
-            const [updatedTrade] = await tx
-                .update(trades)
-                .set({ status: 'ACCEPTED', updatedAt: new Date() })
-                .where(eq(trades.id, tradeId))
-                .returning();
+            const [updatedTrade] = await tx.update(trades).set({ status: 'ACCEPTED', updatedAt: new Date() }).where(eq(trades.id, tradeId)).returning();
 
-            // Notify both parties
-            WebSocketManager.send(updatedTrade.initiatorId, { type: 'TRADE_ACCEPTED', tradeId: updatedTrade.id });
-            WebSocketManager.send(updatedTrade.receiverId, { type: 'TRADE_ACCEPTED', tradeId: updatedTrade.id });
-
-            // 6. Auto-reject other pending trades involving these resources
             const otherTradesResult = await tx
                 .select({ id: trades.id, initiatorId: trades.initiatorId, receiverId: trades.receiverId })
                 .from(trades)
                 .innerJoin(tradeItems, eq(trades.id, tradeItems.tradeId))
-                .where(
-                    and(
-                        eq(trades.status, 'PENDING'),
-                        inArray(tradeItems.resourceId, resourceIds),
-                        not(eq(trades.id, tradeId))
-                    )
-                );
+                .where(and(eq(trades.status, 'PENDING'), inArray(tradeItems.resourceId, resourceIds), not(eq(trades.id, tradeId))));
 
             const otherTradeIds = [...new Set(otherTradesResult.map(t => t.id))].filter(id => id !== tradeId);
-
             if (otherTradeIds.length > 0) {
-                await tx
-                    .update(trades)
-                    .set({ status: 'REJECTED', updatedAt: new Date() })
-                    .where(inArray(trades.id, otherTradeIds));
-
-                // Notify relevant users
-                for (const tId of otherTradeIds) {
-                    const t = otherTradesResult.find(x => x.id === tId);
-                    if (t) {
-                        WebSocketManager.send(t.initiatorId, { type: 'TRADE_REJECTED', tradeId: tId, reason: 'Resource no longer available' });
-                        WebSocketManager.send(t.receiverId, { type: 'TRADE_REJECTED', tradeId: tId, reason: 'Resource no longer available' });
-                    }
-                }
+                await tx.update(trades).set({ status: 'REJECTED', updatedAt: new Date() }).where(inArray(trades.id, otherTradeIds));
             }
 
-            return updatedTrade;
+            return { updatedTrade, otherTradesResult, otherTradeIds };
         });
+
+        // Notifications
+        const receiver = await db.query.users.findFirst({
+            where: eq(users.id, updatedTrade.receiverId),
+            columns: { username: true }
+        });
+
+        WebSocketManager.send(updatedTrade.initiatorId, { type: 'TRADE_ACCEPTED', tradeId: updatedTrade.id });
+        WebSocketManager.send(updatedTrade.receiverId, { type: 'TRADE_ACCEPTED', tradeId: updatedTrade.id });
+
+        await NotificationService.createNotification({
+            userId: updatedTrade.initiatorId,
+            type: 'TRADE_ACCEPTED',
+            content: `@${receiver?.username || 'Someone'} accepted your trade proposal!`,
+            tradeId: updatedTrade.id,
+        });
+
+        for (const tId of otherTradeIds) {
+            const t = otherTradesResult.find(x => x.id === tId);
+            if (t) {
+                WebSocketManager.send(t.initiatorId, { type: 'TRADE_REJECTED', tradeId: tId, reason: 'Resource no longer available' });
+                await NotificationService.createNotification({
+                    userId: t.initiatorId,
+                    type: 'TRADE_REJECTED',
+                    content: `Your trade proposal for some items was closed because they were traded to @${receiver?.username || 'someone else'}.`,
+                    tradeId: tId,
+                });
+            }
+        }
+
+        return updatedTrade;
     }
 
     static async cancelTrade(tradeId: number, userId: number) {
-        return await db.transaction(async (tx) => {
+        const trade = await db.transaction(async (tx) => {
             const [trade] = await tx.select().from(trades).where(eq(trades.id, tradeId));
             if (!trade) throw new HTTPException(404, { message: 'Trade not found' });
             if (trade.initiatorId !== userId) throw new HTTPException(403, { message: 'Only initiator can cancel' });
             if (trade.status !== 'PENDING') throw new HTTPException(400, { message: 'Trade is not pending' });
 
-            const [updated] = await tx
-                .update(trades)
-                .set({ status: 'CANCELLED', updatedAt: new Date() })
-                .where(eq(trades.id, tradeId))
-                .returning();
-
-            WebSocketManager.send(trade.receiverId, { type: 'TRADE_CANCELLED', tradeId });
+            const [updated] = await tx.update(trades).set({ status: 'CANCELLED', updatedAt: new Date() }).where(eq(trades.id, tradeId)).returning();
             return updated;
         });
+
+        WebSocketManager.send(trade.receiverId, { type: 'TRADE_CANCELLED', tradeId: trade.id });
+        return trade;
     }
 
     static async rejectTrade(tradeId: number, userId: number) {
-        return await db.transaction(async (tx) => {
+        const trade = await db.transaction(async (tx) => {
             const [trade] = await tx.select().from(trades).where(eq(trades.id, tradeId));
             if (!trade) throw new HTTPException(404, { message: 'Trade not found' });
             if (trade.receiverId !== userId) throw new HTTPException(403, { message: 'Only receiver can reject' });
             if (trade.status !== 'PENDING') throw new HTTPException(400, { message: 'Trade is not pending' });
 
-            const [updated] = await tx
-                .update(trades)
-                .set({ status: 'REJECTED', updatedAt: new Date() })
-                .where(eq(trades.id, tradeId))
-                .returning();
-
-            WebSocketManager.send(trade.initiatorId, { type: 'TRADE_REJECTED', tradeId });
+            const [updated] = await tx.update(trades).set({ status: 'REJECTED', updatedAt: new Date() }).where(eq(trades.id, tradeId)).returning();
             return updated;
         });
+
+        const receiver = await db.query.users.findFirst({
+            where: eq(users.id, userId),
+            columns: { username: true }
+        });
+
+        WebSocketManager.send(trade.initiatorId, { type: 'TRADE_REJECTED', tradeId: trade.id });
+        await NotificationService.createNotification({
+            userId: trade.initiatorId,
+            type: 'TRADE_REJECTED',
+            content: `@${receiver?.username || 'Someone'} declined your trade proposal.`,
+            tradeId: trade.id,
+        });
+
+        return trade;
     }
 
     static async invalidateTradesByResourceId(resourceId: number) {
-        return await db.transaction(async (tx) => {
-            // Find all PENDING trades involving this resource
-            const involvedTrades = await tx
-                .select({ id: trades.id, initiatorId: trades.initiatorId, receiverId: trades.receiverId })
-                .from(trades)
-                .innerJoin(tradeItems, eq(trades.id, tradeItems.tradeId))
-                .where(
-                    and(
-                        eq(trades.status, 'PENDING'),
-                        eq(tradeItems.resourceId, resourceId)
-                    )
-                );
+        const involvedTrades = await db
+            .select({ id: trades.id, initiatorId: trades.initiatorId, receiverId: trades.receiverId })
+            .from(trades)
+            .innerJoin(tradeItems, eq(trades.id, tradeItems.tradeId))
+            .where(and(eq(trades.status, 'PENDING'), eq(tradeItems.resourceId, resourceId)));
 
-            if (involvedTrades.length === 0) return;
+        if (involvedTrades.length === 0) return;
+        const tradeIds = [...new Set(involvedTrades.map(t => t.id))];
 
-            const tradeIds = [...new Set(involvedTrades.map(t => t.id))];
+        await db.update(trades).set({ status: 'REJECTED', updatedAt: new Date() }).where(inArray(trades.id, tradeIds));
 
-            // Cancel these trades
-            await tx
-                .update(trades)
-                .set({ status: 'CANCELLED', updatedAt: new Date() })
-                .where(inArray(trades.id, tradeIds));
+        for (const trade of involvedTrades) {
+            WebSocketManager.send(trade.initiatorId, { type: 'TRADE_REJECTED', tradeId: trade.id, reason: 'Item removed from network' });
+            WebSocketManager.send(trade.receiverId, { type: 'TRADE_REJECTED', tradeId: trade.id, reason: 'Item removed from network' });
 
-            // Notify participants
-            for (const trade of involvedTrades) {
-                WebSocketManager.send(trade.initiatorId, {
-                    type: 'TRADE_CANCELLED',
-                    tradeId: trade.id,
-                    reason: 'One of the items in this trade was removed from the network'
-                });
-                WebSocketManager.send(trade.receiverId, {
-                    type: 'TRADE_CANCELLED',
-                    tradeId: trade.id,
-                    reason: 'One of the items in this trade was removed from the network'
-                });
-            }
-        });
-    }
-
-    static async getTradesForUser(userId: number) {
-        return await db.select().from(trades).where(
-            // or(eq(trades.initiatorId, userId), eq(trades.receiverId, userId)) // Need to import 'or'
-            // For simplicity just showing initiator ones for now or receiver
-            eq(trades.initiatorId, userId)
-        );
+            await NotificationService.createNotification({
+                userId: trade.initiatorId,
+                type: 'TRADE_REJECTED',
+                content: `Your trade proposal was closed because an item was removed from the network.`,
+                tradeId: trade.id,
+            });
+        }
     }
 }

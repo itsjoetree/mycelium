@@ -77,6 +77,51 @@ tradeApp.openapi(
 
 tradeApp.openapi(
     {
+        method: 'get',
+        path: '/{id}',
+        description: 'Get trade details',
+        security: [{ cookieAuth: [] }],
+        request: {
+            params: z.object({ id: z.string() }),
+        },
+        responses: {
+            200: {
+                description: 'Trade details',
+                content: {
+                    'application/json': {
+                        schema: z.object({
+                            id: z.number(),
+                            initiatorId: z.number(),
+                            receiverId: z.number(),
+                            status: z.string(),
+                            createdAt: z.any(),
+                            initiatorUsername: z.string().nullable(),
+                            receiverUsername: z.string().nullable(),
+                            resources: z.array(z.object({
+                                title: z.string(),
+                                quantity: z.number(),
+                                unit: z.string(),
+                                ownerId: z.number(),
+                                type: z.string(),
+                            })),
+                        }),
+                    },
+                },
+            },
+            404: { description: 'Trade not found' },
+        },
+    },
+    async (c) => {
+        const userId = await requireAuth(c);
+        const id = parseInt(c.req.param('id')!);
+        const trade = await TradeService.getTradeById(id, userId);
+        if (!trade) return c.json({ error: 'Trade not found' }, 404);
+        return c.json(trade, 200);
+    }
+);
+
+tradeApp.openapi(
+    {
         method: 'post',
         path: '/{id}/accept',
         description: 'Accept a trade',

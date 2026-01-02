@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-
-// ... existing code ...
+import { client } from '../lib/api';
 
 export function useTradesList() {
     return useQuery({
@@ -12,7 +11,21 @@ export function useTradesList() {
         },
     });
 }
-import { client } from '../lib/api';
+
+export function useTradeById(id: number | null) {
+    return useQuery({
+        queryKey: ['trades', id],
+        queryFn: async () => {
+            if (!id) return null;
+            const { data, error } = await client.GET('/trades/{id}', {
+                params: { path: { id: id.toString() } },
+            });
+            if (error) throw error;
+            return data;
+        },
+        enabled: !!id,
+    });
+}
 
 export function useCreateTrade() {
     return useMutation({
@@ -61,5 +74,3 @@ export function useRejectTrade() {
         },
     });
 }
-
-
