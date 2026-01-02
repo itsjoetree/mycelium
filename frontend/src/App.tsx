@@ -8,6 +8,7 @@ import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { Settings } from './pages/Settings';
 import { Social } from './pages/Social';
+import { Notifications } from './pages/Notifications';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { Layout } from './components/Layout';
 
@@ -25,6 +26,7 @@ function App() {
                             <Route path="/dashboard" element={<Dashboard />} />
                             <Route path="/settings" element={<Settings />} />
                             <Route path="/social" element={<Social />} />
+                            <Route path="/notifications" element={<Notifications />} />
                             <Route path="*" element={<Navigate to="/login" replace />} />
                         </Routes>
                     </Layout>
