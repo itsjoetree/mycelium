@@ -34,9 +34,13 @@ export function useUserSession() {
     return useQuery({
         queryKey: ['session'],
         queryFn: async () => {
-            const { data, error } = await client.GET('/auth/me');
-            if (error) throw error;
-            return data;
+            const res = await client.GET('/auth/me');
+            if (res.error) {
+                const errorObj = res as any;
+                if (errorObj.response?.status === 401) return null;
+                throw errorObj.error;
+            }
+            return res.data;
         },
         retry: false,
     });
