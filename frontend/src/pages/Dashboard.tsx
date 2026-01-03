@@ -115,6 +115,9 @@ export const Dashboard: React.FC = () => {
     const inventoryResources = resources?.filter((r: any) => r.ownerId === session.id) || [];
     const displayResources = view === 'marketplace' ? marketplaceResources : inventoryResources;
 
+    // Force grid view for inventory
+    const effectiveDisplayMode = view === 'inventory' ? 'grid' : displayMode;
+
     return (
         <div className="flex-1 flex flex-col h-full bg-black overflow-y-auto custom-scrollbar">
             <div className="p-6 md:p-10 pt-8">
@@ -179,14 +182,14 @@ export const Dashboard: React.FC = () => {
                                     <div className="flex gap-2 p-1 bg-white/5 rounded-lg border border-glass-surface">
                                         <button
                                             onClick={() => setDisplayMode('grid')}
-                                            className={`p-2 rounded-md transition-all ${displayMode === 'grid' ? 'bg-primary/20 text-primary shadow-inner' : 'text-text-muted hover:text-text'}`}
+                                            className={`p-2 rounded-md transition-all ${effectiveDisplayMode === 'grid' ? 'bg-primary/20 text-primary shadow-inner' : 'text-text-muted hover:text-text'}`}
                                             title={t('dashboard.view.grid', "Grid View")}
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /></svg>
                                         </button>
                                         <button
                                             onClick={() => setDisplayMode('map')}
-                                            className={`p-2 rounded-md transition-all ${displayMode === 'map' ? 'bg-primary/20 text-primary shadow-inner' : 'text-text-muted hover:text-text'}`}
+                                            className={`p-2 rounded-md transition-all ${effectiveDisplayMode === 'map' ? 'bg-primary/20 text-primary shadow-inner' : 'text-text-muted hover:text-text'}`}
                                             title={t('dashboard.view.map', "Map View")}
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
@@ -237,7 +240,7 @@ export const Dashboard: React.FC = () => {
                                 )}
                             </div>
 
-                            {displayMode === 'grid' ? (
+                            {effectiveDisplayMode === 'grid' ? (
                                 <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-6">
                                     {resourcesLoading ? (
                                         <div className="col-span-full py-20 text-center">

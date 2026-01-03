@@ -15,6 +15,7 @@ export const Settings: React.FC = () => {
 
     const [bio, setBio] = React.useState('');
     const [themeColor, setThemeColor] = React.useState('#00ff9d');
+    const [language, setLanguage] = React.useState(i18n.resolvedLanguage || 'en');
 
     React.useEffect(() => {
         if (profile) {
@@ -23,9 +24,16 @@ export const Settings: React.FC = () => {
         }
     }, [profile]);
 
+    React.useEffect(() => {
+        setLanguage(i18n.resolvedLanguage || 'en');
+    }, [i18n.resolvedLanguage]);
+
     const handleSave = async () => {
         try {
             await updateProfile.mutateAsync({ bio, themeColor });
+            if (language !== i18n.resolvedLanguage) {
+                await i18n.changeLanguage(language);
+            }
             toast.success('Neural profile synchronized');
         } catch (err: any) {
             toast.error(err?.message || 'Failed to sync profile');
@@ -120,8 +128,8 @@ export const Settings: React.FC = () => {
                                     ].map((lang) => (
                                         <button
                                             key={lang.code}
-                                            onClick={() => i18n.changeLanguage(lang.code)}
-                                            className={`py-3 rounded-xl border transition-all duration-300 font-mono text-[0.6rem] uppercase tracking-wider ${(i18n.resolvedLanguage || 'en') === lang.code
+                                            onClick={() => setLanguage(lang.code)}
+                                            className={`py-3 rounded-xl border transition-all duration-300 font-mono text-[0.6rem] uppercase tracking-wider ${language === lang.code
                                                 ? 'bg-white/10 border-white/20 text-white shadow-inner'
                                                 : 'bg-transparent border-transparent text-text-muted hover:bg-white/5 hover:text-white'
                                                 }`}
